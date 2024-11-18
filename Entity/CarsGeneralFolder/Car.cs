@@ -17,7 +17,7 @@ namespace AutoRepairMainCore.Entity.CarsGeneralFolder
         public Brand brand { get; set; }
         [ForeignKey("model_id")]
         public Model model { get; set; }
-        [ForeignKey("engine")]
+        [ForeignKey("engine_id")]
         public Engine engine { get; set; }
     }
 }
