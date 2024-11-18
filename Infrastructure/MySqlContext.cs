@@ -24,6 +24,6 @@ namespace AutoRepairMainCore.Infrastructure
         public DbSet <Order> orders { get; set; }
         public DbSet <Service> services { get; set; }
 
-
+        
     }
 }
