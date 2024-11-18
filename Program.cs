@@ -1,9 +1,17 @@
+using AutoRepairMainCore.Infrastructure;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+string connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddDbContext<MySqlContext>(options =>
+options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
