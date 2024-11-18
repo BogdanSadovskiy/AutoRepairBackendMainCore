@@ -1,0 +1,79 @@
+# Build artifacts
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.csproj.user
+
+# Logs
+*.log
+*.tlog
+
+# Visual Studio specific
+.vscode/
+.vs/
+
+# Rider specific
+.idea/
+
+# Backup files
+*.bak
+*.swp
+
+# Packages and dependencies
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Generated files
+*.dll
+*.exe
+*.pdb
+*.cache
+*.pyc
+*.pidb
+*.mdb
+*.class
+*.ipch
+*.obj
+*.suo
+*.svd
+*.csproj.DotSettings
+
+# Publish output
+publish/
+out/
+
+# IDE-specific
+.DS_Store
+*.coverage
+*.coveragexml
+*.pfx
+*.publishsettings
+.env
+
+# NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+*.nuget.cache
+*.nuget.props
+.nuget.targets
+
+# Test results
+TestResults/
+.trx
+*.coverage
+
+# Environment variables
+.env
+
+# EF Core migrations
+Migrations/
