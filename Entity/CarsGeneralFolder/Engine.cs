@@ -1,7 +1,10 @@
-﻿namespace AutoRepairMainCore.Entity.CarsGeneralFolder
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AutoRepairMainCore.Entity.CarsGeneralFolder
 {
     public class Engine
     {
+        [Key]
         public int id { get; set; }
         public string engine_description { get; set; } = string.Empty;
 
