@@ -13,5 +13,7 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         public string service_password { get; set; } = string.Empty;
 
         public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public int role_id {  get; set; }
+        public Role role { get; set; }
     }
 }
