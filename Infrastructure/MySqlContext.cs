@@ -23,7 +23,7 @@ namespace AutoRepairMainCore.Infrastructure
         public DbSet <Employee> employees { get; set; }
         public DbSet <ErrorCodeOrder> errorCodeOrders { get; set; }
         public DbSet <Order> orders { get; set; }
-        public DbSet <Service> services { get; set; }
+        public DbSet <MyService> myServices { get; set; }
         public DbSet <Role> roles { get; set; }
 
         

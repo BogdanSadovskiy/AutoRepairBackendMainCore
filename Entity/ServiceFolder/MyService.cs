@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
+
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
-    public class Service
+    public class MyService
     {
         [Key]
         public int id { get; set; }
@@ -15,5 +14,7 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         public ICollection<Employee> Employees { get; set; } = new List<Employee>();
         public int role_id {  get; set; }
         public Role role { get; set; }
+        public string? Token { get; set; }
+
     }
 }
