@@ -1,4 +1,5 @@
-﻿using AutoRepairMainCore.Entity.CarsGeneralFolder;
+﻿using AutoRepairMainCore.Entity;
+using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Entity.ErrorCodesGeneralFolder;
 using AutoRepairMainCore.Entity.ServiceFolder;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace AutoRepairMainCore.Infrastructure
         public DbSet <ErrorCodeOrder> errorCodeOrders { get; set; }
         public DbSet <Order> orders { get; set; }
         public DbSet <Service> services { get; set; }
+        public DbSet <Role> roles { get; set; }
 
         
     }
