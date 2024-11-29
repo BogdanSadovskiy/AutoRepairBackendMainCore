@@ -1,5 +1,7 @@
 ﻿using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Infrastructure;
+using BCrypt.Net;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,54 +14,62 @@ namespace AutoRepairMainCore.Service
     public class AuthService : IAuthService
     {
         private IConfiguration _configuration;
-        private DbContext _context;
+        private MySqlContext _context;
 
-        public AuthService(IConfiguration configuration, DbContext context)
+        public AuthService(IConfiguration configuration, MySqlContext context)
         {
             _configuration = configuration;
             _context = context;
         }
 
-        // Register service with hashed password
+     
         public async Task<string> RegisterServiceAsync(string serviceName, string password)
         {
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            if(await CheckExistingService(serviceName, password) != null)
+                throw new InvalidOperationException($"A service \"{serviceName}\" already exists.");
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password).ToString();
 
-            var myService = new MyService
+            MyService myService = new MyService
             {
                 service_name = serviceName,
                 service_password = hashedPassword,
             };
 
-            _context.Services.Add(myService);
+            _context.services.Add(myService);
             await _context.SaveChangesAsync();
 
             return "Service registered successfully!";
         }
 
+        private async Task<MyService> CheckExistingService(string serviceName, string password)
+        {
+            return  await _context.services.FirstOrDefaultAsync(s => s.service_name == serviceName);
+        }
+
         public async Task<string> LoginServiceAsync(string serviceName, string password)
         {
-            var myService = await _context.Services.Include(s => s.role)
-                                                 .FirstOrDefaultAsync(s => s.service_name == serviceName);
+            MyService myService = await (CheckExistingService(serviceName, password));
             if (myService == null)
+            {
                 return "Invalid service name or password";
-
+            }
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, myService.service_password);
             if (!isPasswordValid)
+            {
                 return "Invalid service name or password";
-
+            }
             var token = await GenerateJwtTokenAsync(myService);
             return token;
         }
 
-        // Generate JWT token
+       
         public async Task<string> GenerateJwtTokenAsync(MyService myService)
         {
             var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, myService.service_name),
             new Claim(ClaimTypes.Role, myService.role.role_name),  
-            // Add other claims if necessary, such as service ID, etc.
+       
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -69,7 +79,7 @@ namespace AutoRepairMainCore.Service
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddHours(1),  // Token expiration time
+                expires: DateTime.Now.AddHours(24),  
                 signingCredentials: creds
             );
 

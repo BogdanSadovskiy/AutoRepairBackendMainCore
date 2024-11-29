@@ -1,4 +1,4 @@
-﻿namespace AutoRepairMainCore.Service.DTO
+﻿namespace AutoRepairMainCore.DTO
 {
     public class MyServiceLoginDto
     {

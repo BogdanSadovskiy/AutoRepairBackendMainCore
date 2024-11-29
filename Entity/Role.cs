@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoRepairMainCore.Entity.ServiceFolder;
+using System.ComponentModel.DataAnnotations;
 
 namespace AutoRepairMainCore.Entity
 {
@@ -6,7 +7,7 @@ namespace AutoRepairMainCore.Entity
     {
         [Key]
         public int id {  get; set; }
-        public string role_name { get; set; }
-        public ICollection<Role> roles { get; set; }
+        public string role_name { get; set; } = "user";
+        public ICollection<MyService> Services { get; set; } = new List<MyService>();
     }
 }
