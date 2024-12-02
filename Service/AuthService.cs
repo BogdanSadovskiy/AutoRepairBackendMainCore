@@ -1,7 +1,7 @@
-﻿using AutoRepairMainCore.Entity.ServiceFolder;
+﻿using AutoRepairMainCore.DTO;
+using AutoRepairMainCore.Entity;
+using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Infrastructure;
-using BCrypt.Net;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,11 +15,14 @@ namespace AutoRepairMainCore.Service
     {
         private IConfiguration _configuration;
         private MySqlContext _context;
+        IRoleService _roleService;
+        
 
-        public AuthService(IConfiguration configuration, MySqlContext context)
+        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService)
         {
             _configuration = configuration;
             _context = context;
+            _roleService = roleService;
         }
 
      
@@ -33,6 +36,7 @@ namespace AutoRepairMainCore.Service
             {
                 service_name = serviceName,
                 service_password = hashedPassword,
+                role_id = Role.setUserRole()
             };
 
             _context.services.Add(myService);
@@ -58,19 +62,20 @@ namespace AutoRepairMainCore.Service
             {
                 return "Invalid service name or password";
             }
-            var token = await GenerateJwtTokenAsync(myService);
+            Role role = _roleService.GetRole(myService.role_id);
+            string token = await GenerateJwtTokenAsync(myService);
             return token;
         }
 
        
         public async Task<string> GenerateJwtTokenAsync(MyService myService)
         {
-            var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, myService.service_name),
-            new Claim(ClaimTypes.Role, myService.role.role_name),  
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, myService.service_name),
+                new Claim(ClaimTypes.Role, myService.role_id.ToString()),  
        
-        };
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

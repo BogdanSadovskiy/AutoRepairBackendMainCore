@@ -1,4 +1,4 @@
-﻿using AutoRepairMainCore.Models;
+﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,16 +16,16 @@ namespace AutoRepairMainCore.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] MyServiceRegistrationDto userService)
         {
-            var result = await _authService.RegisterServiceAsync(model.ServiceName, model.Password);
+            string result = await _authService.RegisterServiceAsync(userService.ServiceName, userService.Password);
             return Ok(result);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] MyServiceLoginDto userService)
         {
-            var token = await _authService.LoginServiceAsync(model.ServiceName, model.Password);
+            string token = await _authService.LoginServiceAsync(userService.ServiceName, userService.Password);
             if (token.StartsWith("Invalid"))
                 return Unauthorized(token);
 
