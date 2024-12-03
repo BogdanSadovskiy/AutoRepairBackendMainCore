@@ -1,4 +1,5 @@
-﻿using AutoRepairMainCore.Entity.CarsGeneralFolder;
+﻿using AutoRepairMainCore.Entity;
+using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Entity.ErrorCodesGeneralFolder;
 using AutoRepairMainCore.Entity.ServiceFolder;
 using Microsoft.EntityFrameworkCore;
@@ -16,14 +17,16 @@ namespace AutoRepairMainCore.Infrastructure
         public DbSet<Car> cars { get; set; }
 
         public DbSet<Block> blocks { get; set; }
-        public DbSet <ErrorCode> errorCodes { get; set; }
+        public DbSet<ErrorCode> errorCodes { get; set; }
+        public DbSet<Role> roles { get; set; }
+        public DbSet<MyService> services { get; set; }
 
-        public DbSet <ClientCar> clientCars { get; set; }
-        public DbSet <Employee> employees { get; set; }
-        public DbSet <ErrorCodeOrder> errorCodeOrders { get; set; }
-        public DbSet <Order> orders { get; set; }
-        public DbSet <Service> services { get; set; }
+        public DbSet<ClientCar> clientCars { get; set; }
+        public DbSet<Employee> employees { get; set; }
+        public DbSet<ErrorCodeOrder> errorCodeOrders { get; set; }
+        public DbSet<Order> orders { get; set; }
 
-        
+
+       
     }
 }
