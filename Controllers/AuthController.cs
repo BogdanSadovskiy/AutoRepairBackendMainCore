@@ -18,14 +18,14 @@ namespace AutoRepairMainCore.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] MyServiceRegistrationDto userService)
         {
-            string result = await _authService.RegisterServiceAsync(userService.ServiceName, userService.Password);
+            string result = await _authService.RegisterServiceAsync(userService);
             return Ok(result);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] MyServiceLoginDto userService)
         {
-            string token = await _authService.LoginServiceAsync(userService.ServiceName, userService.Password);
+            string token = await _authService.LoginServiceAsync(userService);
             if (token.StartsWith("Invalid"))
                 return Unauthorized(token);
 

@@ -26,15 +26,15 @@ namespace AutoRepairMainCore.Service
         }
 
      
-        public async Task<string> RegisterServiceAsync(string serviceName, string password)
+        public async Task<string> RegisterServiceAsync(MyServiceRegistrationDto userService)
         {
-            if(await CheckExistingService(serviceName, password) != null)
-                throw new InvalidOperationException($"A service \"{serviceName}\" already exists.");
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password).ToString();
+            if(await CheckExistingService(userService.ServiceName) != null)
+                throw new InvalidOperationException($"A service \"{userService.ServiceName}\" already exists.");
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userService.Password).ToString();
 
             MyService myService = new MyService
             {
-                service_name = serviceName,
+                service_name = userService.ServiceName,
                 service_password = hashedPassword,
                 role_id = Role.setUserRole()
             };
@@ -45,35 +45,35 @@ namespace AutoRepairMainCore.Service
             return "Service registered successfully!";
         }
 
-        private async Task<MyService> CheckExistingService(string serviceName, string password)
+        private async Task<MyService> CheckExistingService(string serviceName)
         {
             return  await _context.services.FirstOrDefaultAsync(s => s.service_name == serviceName);
         }
 
-        public async Task<string> LoginServiceAsync(string serviceName, string password)
+        public async Task<string> LoginServiceAsync(MyServiceLoginDto userService)
         {
-            MyService myService = await (CheckExistingService(serviceName, password));
+            MyService myService = await (CheckExistingService(userService.ServiceName));
             if (myService == null)
             {
                 return "Invalid service name or password";
             }
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, myService.service_password);
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userService.Password, myService.service_password);
             if (!isPasswordValid)
             {
                 return "Invalid service name or password";
             }
             Role role = _roleService.GetRole(myService.role_id);
-            string token = await GenerateJwtTokenAsync(myService);
+            string token = await GenerateJwtTokenAsync(myService, role);
             return token;
         }
 
        
-        public async Task<string> GenerateJwtTokenAsync(MyService myService)
+        public async Task<string> GenerateJwtTokenAsync(MyService myService,Role role)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, myService.service_name),
-                new Claim(ClaimTypes.Role, myService.role_id.ToString()),  
+                new Claim(ClaimTypes.Role, role.role_name),  
        
             };
 

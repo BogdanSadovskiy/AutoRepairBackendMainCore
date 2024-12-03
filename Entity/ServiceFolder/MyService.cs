@@ -13,7 +13,10 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         public string service_name { get; set; } = string.Empty;
         public string service_password { get; set; } = string.Empty;
         public int role_id { get; set; }
-        public RolesEnum role {  get; set; }
+
+        [ForeignKey("role_id")]
+        public Role role { get; set; }
+        [NotMapped]
         public ICollection<Employee> Employees { get; set; } = new List<Employee>();
      
 

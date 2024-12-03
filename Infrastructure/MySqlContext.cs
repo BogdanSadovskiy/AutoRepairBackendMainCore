@@ -27,36 +27,6 @@ namespace AutoRepairMainCore.Infrastructure
         public DbSet<Order> orders { get; set; }
 
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-
-            modelBuilder.Entity<MyService>(entity =>
-            {
-
-                entity.HasKey(e => e.id);
-
-                entity.HasOne<Role>()  
-                         .WithMany()  
-                         .HasForeignKey(e => e.role_id)  
-                         .OnDelete(DeleteBehavior.Restrict);
-
-                entity.Property(e => e.role_id)
-                .IsRequired();
-
-                entity.Property(e => e.service_name)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(e => e.service_password)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-               
-
-            });
-
-        }
+       
     }
 }
