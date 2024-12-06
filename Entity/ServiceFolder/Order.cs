@@ -6,18 +6,26 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
     public class Order
     {
         [Key]
-        public int id { get; set; }
-        public int client_car_id { get; set; }
-        public int employee_id { get; set; }
-        public DateTime date_in { get; set; }
-        public DateTime? date_out { get; set; }
-        public string description { get; set; } = string.Empty;
-        public decimal? work_price { get; set; }
-        public decimal? employee_income { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
+        [Column("client_car_id")]
+        public int ClientCarId { get; set; }
+        [Column ("employee_id")]
+        public int EmployeeId { get; set; }
+        [Column("date_in")]
+        public DateTime DateIn { get; set; }
+        [Column("date_out")]
+        public DateTime? DateOut { get; set; }
+        [Column("description")]
+        public string Description { get; set; } = string.Empty;
+        [Column("work_price")]
+        public decimal? WorkPrice { get; set; }
+        [Column("employee_income")]
+        public decimal? EmployeeIncome { get; set; }
 
         [ForeignKey("client_car_id")]
-        public ClientCar clientCar { get; set; }
+        public ClientCar ClientCar { get; set; }
         [ForeignKey("employee_id")]
-        public Employee employee { get; set; }
+        public Employee Employee { get; set; }
     }
 }

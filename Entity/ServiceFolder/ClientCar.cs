@@ -7,11 +7,14 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
     public class ClientCar
     {
         [Key]
-        public int id { get; set; }
-        public int car_id { get; set; }
-        public string vin_code { get; set; } = string.Empty;
+        [Column("id")]
+        public int Id { get; set; }
+        [Column("car_id")]
+        public int CarId { get; set; }
+        [Column("vin_code")]
+        public string VinCode { get; set; } = string.Empty;
+
         [ForeignKey("car_id")]
-        public Car car { get; set; }
- 
+        public Car Car { get; set; }
     }
 }

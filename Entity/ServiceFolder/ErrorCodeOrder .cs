@@ -7,13 +7,18 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
     public class ErrorCodeOrder
     {
         [Key]
-        public int id { get; set; }
-        public int order_id { get; set; }
-        public int error_code_id { get; set; }
-        public DateTime date { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
+        [Column("order_id")]
+        public int OrderId { get; set; }
+        [Column ("error_code_id")]
+        public int ErrorCodeId { get; set; }
+        [Column("data")]
+        public DateTime Date { get; set; }
 
         [ForeignKey("order_id")]
         public Order order { get; set; }
+
         [ForeignKey("error_code_id")]
         public ErrorCode errorCode { get; set; }
     }
