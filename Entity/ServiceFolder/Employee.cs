@@ -6,12 +6,18 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
     public class Employee
     {
         [Key]
-        public int id { get; set; }
-        public string? employee_photo_file_path { get; set; }
-        public int service_id { get; set; }
-        public string employee_name { get; set; } = string.Empty;
-        public bool currently_working { get; set; }
-        [ForeignKey("service_id")]
-        public MyService service { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
+        [Column("employee_photo_file_path")]
+        public string? EmployeePhotoFilePath { get; set; }
+        [Column ("autoservice_id")]
+        public int AutoServiceId { get; set; }
+        [Column("employee_name")]
+        public string EmployeeName { get; set; } = string.Empty;
+        [Column ("currently_working")]
+        public bool CurrentlyWorking { get; set; }
+
+        [ForeignKey("autoservice_id")]
+        public AutoService AutoService { get; set; }
     }
 }

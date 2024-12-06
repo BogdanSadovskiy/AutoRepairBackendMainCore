@@ -1,21 +1,30 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Entity.ServiceFolder;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity
 {
     public class Role
     {
         [Key]
-        public int id { get; set; }
-        public string role_name { get; set; }
-        public ICollection<MyService> Services { get; set; } = new List<MyService>();
+        [Column("id")]
+        public int Id { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
+        public ICollection<AutoService> AutoServices { get; set; } = new List<AutoService>();
 
-        public RolesEnum getEnumRole()
+        public RolesEnum? getEnumRole()
         {
-            return role_name == "admin" ? RolesEnum.admin :
-          (role_name == "user" ? RolesEnum.user : 
-          throw new ArgumentException("Invalid role name"));
+            if (this.Name == "admin")
+            {
+                return RolesEnum.admin;
+            }
+            else if (this.Name == "user")
+            {
+                return RolesEnum.user;
+            }
+            return null;
         }
         public static int setAdminRole()
         {
@@ -23,7 +32,7 @@ namespace AutoRepairMainCore.Entity
         }
         public static int setUserRole()
         {
-            return ((int)RolesEnum.user);
+            return (int)RolesEnum.user;
         }
 
     }

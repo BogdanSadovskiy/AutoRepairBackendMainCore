@@ -4,7 +4,6 @@ namespace AutoRepairMainCore.Service
 {
     public interface IRoleService
     {
-
-        Role GetRole(int role_id);
+        Role GetRole(int roleId);
     }
 }

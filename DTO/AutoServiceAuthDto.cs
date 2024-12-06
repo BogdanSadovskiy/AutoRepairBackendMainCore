@@ -1,8 +1,8 @@
 ﻿namespace AutoRepairMainCore.DTO
 {
-    public class MyServiceLoginDto
+    public class AutoServiceAuthDto
     {
-        public string ServiceName { get; set; }
+        public string Name { get; set; }
         public string Password { get; set; }
     }
 }

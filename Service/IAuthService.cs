@@ -5,8 +5,8 @@ namespace AutoRepairMainCore.Service
 {
     public interface IAuthService
     {
-        Task<string> RegisterServiceAsync(MyServiceRegistrationDto userService);
-        Task<string> LoginServiceAsync(MyServiceLoginDto userService);
-        Task<string> GenerateJwtTokenAsync(MyService myService, Role role);
+        Task<string> RegisterServiceAsync(AutoServiceAuthDto userService);
+        Task<string> LoginServiceAsync(AutoServiceAuthDto userService);
+        Task<string> GenerateJwtTokenAsync(AutoService myService, Role role);
     }
 }

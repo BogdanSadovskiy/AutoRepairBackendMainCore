@@ -1,7 +1,7 @@
 ﻿using AutoRepairMainCore.Entity;
 using AutoRepairMainCore.Infrastructure;
 
-namespace AutoRepairMainCore.Service
+namespace AutoRepairMainCore.Service.Implementations
 {
     public class RoleService : IRoleService
     {
@@ -13,14 +13,14 @@ namespace AutoRepairMainCore.Service
             _context = context;
         }
 
-        public Role GetRole(int role_id)
+        public Role GetRole(int roleId)
         {
-           
-            Role role = _context.roles.FirstOrDefault(r => r.id == role_id);
+
+            Role role = _context.roles.FirstOrDefault(r => r.Id == roleId);
 
             if (role == null)
             {
-                throw new KeyNotFoundException($"Role with ID {role_id} not found.");
+                throw new KeyNotFoundException($"Role with ID {roleId} not found.");
             }
 
             return role;

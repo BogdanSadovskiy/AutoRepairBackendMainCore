@@ -1,11 +1,11 @@
-using AutoRepairMainCore.Infrastructure;
-
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
+using AutoRepairMainCore.Infrastructure;
+using AutoRepairMainCore.Service;
+using AutoRepairMainCore.Service.Implementations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using AutoRepairMainCore.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +24,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"], 
-            ValidAudience = builder.Configuration["Jwt:Audience"], 
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) 
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 
