@@ -6,12 +6,16 @@ namespace AutoRepairMainCore.Entity.ErrorCodesGeneralFolder
     public class ErrorCode
     {
         [Key]
-        public int id { get; set; }
-        public string code { get; set; } = string.Empty;
-        public string description { get; set; } = string.Empty;
-        public int block_id { get; set; }
-
+        [Column("id")]
+        public int Id { get; set; }
+        [Column("block_id")]
+        public int BlockId { get; set; }
+        [Column("code")]
+        public string Code { get; set; } = string.Empty;
+        [Column("description")]
+        public string Description { get; set; } = string.Empty;
+  
         [ForeignKey("block_id")]
-        public Block block { get; set; }
+        public Block Block { get; set; }
     }
 }
