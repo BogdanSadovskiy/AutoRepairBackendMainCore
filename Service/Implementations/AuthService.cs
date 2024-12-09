@@ -86,7 +86,7 @@ namespace AutoRepairMainCore.Service.Implementations
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddHours(24),
+                expires: DateTime.Now.AddHours(48),
                 signingCredentials: creds
             );
 
