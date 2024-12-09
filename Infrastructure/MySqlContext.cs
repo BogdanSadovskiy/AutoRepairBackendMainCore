@@ -33,8 +33,5 @@ namespace AutoRepairMainCore.Infrastructure
         public DbSet<ErrorCodeOrder> errorCodeOrders { get; set; }
 
         public DbSet<Order> orders { get; set; }
-
-
-       
     }
 }

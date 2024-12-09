@@ -7,6 +7,7 @@ namespace AutoRepairMainCore.Service.Implementations
     {
         private IConfiguration _configuration;
         private MySqlContext _context;
+
         public RoleService(IConfiguration configuration, MySqlContext context)
         {
             _configuration = configuration;
@@ -15,7 +16,6 @@ namespace AutoRepairMainCore.Service.Implementations
 
         public Role GetRole(int roleId)
         {
-
             Role role = _context.roles.FirstOrDefault(r => r.Id == roleId);
 
             if (role == null)
