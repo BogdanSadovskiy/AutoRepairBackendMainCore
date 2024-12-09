@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
-   
     public class AutoService
     {
         [Key]

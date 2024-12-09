@@ -76,7 +76,6 @@ namespace AutoRepairMainCore.Service.Implementations
             {
                 new Claim(ClaimTypes.Name, AutoService.Name),
                 new Claim(ClaimTypes.Role, role.Name),
-
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -89,9 +88,7 @@ namespace AutoRepairMainCore.Service.Implementations
                 expires: DateTime.Now.AddHours(48),
                 signingCredentials: creds
             );
-
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
     }
 }

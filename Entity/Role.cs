@@ -26,10 +26,12 @@ namespace AutoRepairMainCore.Entity
             }
             return null;
         }
+
         public static int setAdminRole()
         {
             return (int)RolesEnum.admin;
         }
+
         public static int setUserRole()
         {
             return (int)RolesEnum.user;
