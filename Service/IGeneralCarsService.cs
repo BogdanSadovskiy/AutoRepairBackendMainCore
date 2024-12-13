@@ -5,8 +5,16 @@ namespace AutoRepairMainCore.Service
 {
     public interface IGeneralCarsService
     {
-        Task<List<Brand>> GetBrandsAsync();
-        Task<List<Model>> GetModelsAsync();
-        Task<List<Engine>> GetEnginesAsync();
+        Task<List<Brand>> GetBrands();
+        Task<List<Model>> GetModels();
+        Task<List<Engine>> GetEngines();
+        Task<Brand> GetBrand(string name);
+        Task<Model> GetModel(string name);
+        Task<Engine> GetEngine(string name);
+        Task<Brand> AddNewBrand(Brand brand);
+        
+        Task<Model> AddNewModel(Model model);
+
+        Task<string> AddNewEngine(Engine engine);
     }
 }

@@ -1,4 +1,6 @@
-﻿using AutoRepairMainCore.Service;
+﻿using AutoRepairMainCore.DTO;
+using AutoRepairMainCore.Entity.CarsGeneralFolder;
+using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoRepairMainCore.Controllers
@@ -11,7 +13,7 @@ namespace AutoRepairMainCore.Controllers
 
         public GeneralCarsController(IGeneralCarsService generalCarsService)
         {
-            generalCarsService = dropdownService;
+            _generalCarsService = generalCarsService;
         }
 
         [HttpGet("brands")]
@@ -19,7 +21,7 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                var brands = await _generalCarsService.GetBrandsAsync();
+                List<Brand> brands = await _generalCarsService.GetBrandsAsync();
                 return Ok(brands);
             }
             catch (Exception ex)
@@ -33,7 +35,7 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                var models = await _generalCarsService.GetModelsAsync();
+                List<Model> models = await _generalCarsService.GetModelsAsync();
                 return Ok(models);
             }
             catch (Exception ex)
@@ -47,12 +49,45 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                var engines = await _generalCarsService.GetEnginesAsync();
+                List<Engine> engines = await _generalCarsService.GetEnginesAsync();
                 return Ok(engines);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error retrieving engines: {ex.Message}");
+            }
+        }
+
+        [HttpPost("addCar")]
+        public async Task<IActionResult> AddCarToLibrary([FromBody] NewCarForGeneralLibraryDto addCarDto)
+        {
+            if (addCarDto == null)
+            {
+                return BadRequest("Invalid car data.");
+            }
+
+            try
+            {
+                var brand = await _generalCarsService.EnsureBrandExistsAsync(addCarDto.BrandName);
+                var model = await _generalCarsService.EnsureModelExistsAsync(addCarDto.ModelName);
+                var engine = await _generalCarsService.EnsureEngineExistsAsync(addCarDto.EngineDescription);
+
+                // Step 4: Create the Car entity
+                var car = new Car
+                {
+                    BrandId = brand.Id,
+                    ModelId = model.Id,
+                    EngineId = engine.Id
+                };
+
+                // Step 5: Add the Car to the library
+                await _generalCarsService.AddCarAsync(car);
+
+                return Ok("Car added successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error adding car to the library: {ex.Message}");
             }
         }
     }
