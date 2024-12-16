@@ -1,20 +1,30 @@
-﻿using AutoRepairMainCore.Entity.CarsGeneralFolder;
+﻿using AutoRepairMainCore.DTO;
+using AutoRepairMainCore.DTO.Models;
+using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoRepairMainCore.Service
 {
     public interface IGeneralCarsService
     {
-        Task<List<Brand>> GetBrands();
-        Task<List<Model>> GetModels();
-        Task<List<Engine>> GetEngines();
-        Task<Brand> GetBrand(string name);
-        Task<Model> GetModel(string name);
-        Task<Engine> GetEngine(string name);
-        Task<Brand> AddNewBrand(Brand brand);
-        
-        Task<Model> AddNewModel(Model model);
+        List<Brand> GetBrands();
 
-        Task<string> AddNewEngine(Engine engine);
+        List<Model> GetModels();
+
+        List<Engine> GetEngines();
+
+        Brand GetBrand(string name);
+
+        Model GetModel(string name);
+
+        Engine GetEngine(string name);
+
+        CarResults<Brand> AddBrand(string brand);
+
+        CarResults<Model> AddModel(string model);
+
+        CarResults<Engine> AddEngine(string engine);
+
+        Car AddCar(CarDto newCar);
     }
 }

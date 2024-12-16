@@ -1,58 +1,153 @@
-﻿
+﻿using AutoRepairMainCore.DTO.Models;
+using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Infrastructure;
+using AutoRepairMainCore.Service;
 using Microsoft.EntityFrameworkCore;
 
-namespace AutoRepairMainCore.Service.Implementations
+public class GeneralCarsService : IGeneralCarsService
 {
-    public class GeneralCarsService : IGeneralCarsService
+    private readonly MySqlContext _context;
+
+    public GeneralCarsService(MySqlContext context)
     {
-        private readonly MySqlContext _context;
+        _context = context;
+    }
 
-        public GeneralCarsService(MySqlContext context)
+    public List<Brand> GetBrands()
+    {
+        return _context.brands.ToList();
+    }
+
+    public List<Model> GetModels()
+    {
+        return _context.models.ToList();
+    }
+
+    public List<Engine> GetEngines()
+    {
+        return _context.engines.ToList();
+    }
+
+    public CarResults<Brand> AddBrand(string brand)
+    {
+        string formattedBrand = FormatName(brand);
+        var existingBrand = _context.brands.FirstOrDefault(b => b.BrandName == formattedBrand);
+        if (existingBrand != null)
         {
-            _context = context;
+            return new CarResults<Brand>(existingBrand, false);
         }
 
-        public async Task<List<Brand>> GetBrands()
+        var newBrand = new Brand { BrandName = formattedBrand };
+        _context.brands.Add(newBrand);
+        _context.SaveChanges();
+
+        return new CarResults<Brand>(newBrand, true);
+    }
+
+    public CarResults<Model> AddModel(string model)
+    {
+        string formattedModel = FormatName(model);
+        var existingModel = _context.models.FirstOrDefault(m => m.ModelName == formattedModel);
+        if (existingModel != null)
         {
-            return await _context.brands.ToListAsync();
+            return new CarResults<Model>(existingModel, false);
         }
 
-        public async Task<List<Model>> GetModels()
+        var newModel = new Model { ModelName = formattedModel };
+        _context.models.Add(newModel);
+        _context.SaveChanges();
+
+        return new CarResults<Model>(newModel, true);
+    }
+
+    public CarResults<Engine> AddEngine(string engineDescription)
+    {
+        string formattedEngine = engineDescription.Trim();
+        var existingEngine = _context.engines.FirstOrDefault(e => e.EngineDescription == formattedEngine);
+        if (existingEngine != null)
         {
-            return await _context.models.ToListAsync();
+            return new CarResults<Engine>(existingEngine, false);
         }
 
-        public async Task<List<Engine>> GetEngines()
+        var newEngine = new Engine { EngineDescription = formattedEngine };
+        _context.engines.Add(newEngine);
+        _context.SaveChanges();
+
+        return new CarResults<Engine>(newEngine, true);
+    }
+
+    public Car AddCar(int brandId, int modelId, int engineId)
+    {
+        var newCar = new Car
         {
-            return await _context.engines.ToListAsync();
+            BrandId = brandId,
+            ModelId = modelId,
+            EngineId = engineId
+        };
+
+        _context.cars.Add(newCar);
+        _context.SaveChanges();
+        return newCar;
+    }
+
+    public Car AddCar(CarDto newCar)
+    {
+        string formattedBrand = FormatName(newCar.Brand);
+        string formattedModel = FormatName(newCar.Model);
+        string formattedEngine = newCar.Engine.Trim();
+
+        var existingCar = CheckExistingCar(formattedBrand, formattedModel, formattedEngine);
+        if (existingCar != null)
+        {
+            throw new Exception($"The {formattedBrand} {formattedModel} {formattedEngine} already exists");
         }
 
-        public Task<string> AddNewBrand(Brand brand)
+        var brandResult = AddBrand(formattedBrand);
+        var modelResult = AddModel(formattedModel);
+        var engineResult = AddEngine(formattedEngine);
+
+        var newEntityCar = new Car
         {
-            throw new NotImplementedException();
-        }
+            BrandId = brandResult.Entity.Id,
+            ModelId = modelResult.Entity.Id,
+            EngineId = engineResult.Entity.Id
+        };
 
-        public Task<string> AddNewModel(Model model)
-        {
-            throw new NotImplementedException();
-        }
+        _context.cars.Add(newEntityCar);
+        _context.SaveChanges();
+        return newEntityCar;
+    }
 
-        public async Task<Engine> AddNewEngine(string engineDescription)
-        {
-            Engine existingEngine = await _context.engines.FirstOrDefaultAsync(e => e.EngineDescription == engineDescription);
-            if (existingEngine != null)
-            {
-                return existingEngine; 
-            }
+    private Car CheckExistingCar(string brand, string model, string engine)
+    {
+        return _context.cars
+            .Include(c => c.Brand)
+            .Include(c => c.Model)
+            .Include(c => c.Engine)
+            .FirstOrDefault(c => c.Brand.BrandName == brand &&
+                                 c.Model.ModelName == model &&
+                                 c.Engine.EngineDescription == engine);
+    }
 
-            Engine newEngine = new Engine { EngineDescription = engineDescription };
-            _context.engines.Add(newEngine);
-            await _context.SaveChangesAsync();
-            return newEngine;
-        }
+    private string FormatName(string name)
+    {
+        name = name.Trim();
+        return char.ToUpper(name[0]) + name.Substring(1).ToLower();
+    }
 
-        
+    public Brand GetBrand(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Model GetModel(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Engine GetEngine(string name)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
+    [Table("services")]
     public class AutoService
     {
         [Key]
@@ -19,7 +20,7 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Column("role_id")]
         public int RoleId { get; set; }
 
-        [ForeignKey("role_id")]
+        [ForeignKey("RoleId")]
         public Role Role { get; set; }
 
         [NotMapped]

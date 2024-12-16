@@ -21,7 +21,7 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                List<Brand> brands = await _generalCarsService.GetBrandsAsync();
+                List<Brand> brands =  _generalCarsService.GetBrands();
                 return Ok(brands);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                List<Model> models = await _generalCarsService.GetModelsAsync();
+                List<Model> models = _generalCarsService.GetModels();
                 return Ok(models);
             }
             catch (Exception ex)
@@ -49,7 +49,7 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                List<Engine> engines = await _generalCarsService.GetEnginesAsync();
+                List<Engine> engines = _generalCarsService.GetEngines();
                 return Ok(engines);
             }
             catch (Exception ex)
@@ -59,30 +59,16 @@ namespace AutoRepairMainCore.Controllers
         }
 
         [HttpPost("addCar")]
-        public async Task<IActionResult> AddCarToLibrary([FromBody] NewCarForGeneralLibraryDto addCarDto)
+        public async Task<IActionResult> AddCarToLibrary([FromBody] CarDto newCar)
         {
-            if (addCarDto == null)
+            if (newCar == null)
             {
                 return BadRequest("Invalid car data.");
             }
 
             try
             {
-                var brand = await _generalCarsService.EnsureBrandExistsAsync(addCarDto.BrandName);
-                var model = await _generalCarsService.EnsureModelExistsAsync(addCarDto.ModelName);
-                var engine = await _generalCarsService.EnsureEngineExistsAsync(addCarDto.EngineDescription);
-
-                // Step 4: Create the Car entity
-                var car = new Car
-                {
-                    BrandId = brand.Id,
-                    ModelId = model.Id,
-                    EngineId = engine.Id
-                };
-
-                // Step 5: Add the Car to the library
-                await _generalCarsService.AddCarAsync(car);
-
+                _generalCarsService.AddCar(newCar);
                 return Ok("Car added successfully.");
             }
             catch (Exception ex)
