@@ -2,6 +2,7 @@
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace AutoRepairMainCore.Controllers
 {
@@ -10,10 +11,13 @@ namespace AutoRepairMainCore.Controllers
     public class GeneralCarsController : Controller
     {
         private readonly IGeneralCarsService _generalCarsService;
+        private readonly ITokenValidationService _tokenValidationService;
 
-        public GeneralCarsController(IGeneralCarsService generalCarsService)
+        public GeneralCarsController(IGeneralCarsService generalCarsService, 
+            ITokenValidationService tokenValidationService)
         {
             _generalCarsService = generalCarsService;
+            _tokenValidationService = tokenValidationService;
         }
 
         [HttpGet("brands")]
@@ -45,7 +49,7 @@ namespace AutoRepairMainCore.Controllers
         }
 
         [HttpGet("engines")]
-        public async Task<IActionResult> GetEngines()
+        public async Task<IActionResult> GetEngines([FromHeader(Name = "Authorization")] string token)
         {
             try
             {
@@ -59,8 +63,11 @@ namespace AutoRepairMainCore.Controllers
         }
 
         [HttpPost("addCar")]
-        public async Task<IActionResult> AddCarToLibrary([FromBody] CarDto newCar)
+        public async Task<IActionResult> AddCarToLibrary(
+            [FromBody] CarDto newCar,
+            [FromHeader(Name = "Authorization")] string token)
         {
+            _tokenValidationService.ValidateToken(token);
             _generalCarsService.AddCar(newCar);
             return Ok("Car added successfully.");
         }

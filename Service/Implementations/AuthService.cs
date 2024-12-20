@@ -17,14 +17,17 @@ namespace AutoRepairMainCore.Service.Implementations
     {
         private IConfiguration _configuration;
         private MySqlContext _context;
+        private ITokenValidationService _tokenValidationService;
         IRoleService _roleService;
 
 
-        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService)
+        public AuthService(IConfiguration configuration, MySqlContext context, 
+            IRoleService roleService, ITokenValidationService tokenValidationService)
         {
             _configuration = configuration;
             _context = context;
             _roleService = roleService;
+            _tokenValidationService = tokenValidationService;
         }
 
 
@@ -69,30 +72,8 @@ namespace AutoRepairMainCore.Service.Implementations
                 throw new AutoServiceNotFoundException("Invalid service name or password");
             }
             Role role = _roleService.GetRole(autoService.RoleId);
-            string token = await GenerateJwtTokenAsync(autoService, role);
+            string token = _tokenValidationService.GenerateToken(autoService, role);
             return token;
-        }
-
-
-        public async Task<string> GenerateJwtTokenAsync(AutoService AutoService, Role role)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, AutoService.Name),
-                new Claim(ClaimTypes.Role, role.Name),
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddHours(48),
-                signingCredentials: creds
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         private void ValidatePassword(string password)

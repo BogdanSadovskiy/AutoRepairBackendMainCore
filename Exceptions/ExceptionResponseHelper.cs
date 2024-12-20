@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.Json;
 using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
+using Microsoft.IdentityModel.Tokens;
 
 public class ExceptionResponseHelper
 {
@@ -35,6 +36,9 @@ public class ExceptionResponseHelper
                 return (HttpStatusCode.Conflict, exception.Message);
 
             case PasswordValidateException:
+                return (HttpStatusCode.BadRequest, exception.Message);
+
+            case SecurityTokenException:
                 return (HttpStatusCode.BadRequest, exception.Message);
 
             case CarAlreadyExistException:

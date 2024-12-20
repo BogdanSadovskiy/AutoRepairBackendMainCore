@@ -7,6 +7,5 @@ namespace AutoRepairMainCore.Service
     {
         Task<string> RegisterServiceAsync(AutoServiceAuthDto userService);
         Task<string> LoginServiceAsync(AutoServiceAuthDto userService);
-        Task<string> GenerateJwtTokenAsync(AutoService myService, Role role);
     }
 }
