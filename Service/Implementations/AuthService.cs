@@ -1,12 +1,14 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Entity;
 using AutoRepairMainCore.Entity.ServiceFolder;
+using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AutoRepairMainCore.Service.Implementations
 {
@@ -28,11 +30,14 @@ namespace AutoRepairMainCore.Service.Implementations
 
         public async Task<string> RegisterServiceAsync(AutoServiceAuthDto userAutoService)
         {
+            ValidatePassword(userAutoService.Password);
+
             if (await GetExistingService(userAutoService.Name) != null)
             {
-                throw new InvalidOperationException($"A service \"{userAutoService.Name}\" already exists.");
+                throw new AutoServiceAlreadyExistException($"A service \"{userAutoService.Name}\" already exists.");
             }
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password).ToString();
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password);
 
             AutoService myService = new AutoService
             {
@@ -43,8 +48,7 @@ namespace AutoRepairMainCore.Service.Implementations
 
             _context.services.Add(myService);
             await _context.SaveChangesAsync();
-
-            return "Service registered successfully!";
+            return $"Service {myService.Name} registered successfully!";
         }
 
         private async Task<AutoService> GetExistingService(string AutoServiceName)
@@ -57,12 +61,12 @@ namespace AutoRepairMainCore.Service.Implementations
             AutoService autoService = await GetExistingService(userAutoService.Name);
             if (autoService == null)
             {
-                throw new InvalidOperationException("Invalid service name or password");
+                throw new AutoServiceNotFoundException("Invalid service name or password");
             }
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userAutoService.Password, autoService.Password);
             if (!isPasswordValid)
             {
-                throw new InvalidOperationException("Invalid service name or password");
+                throw new AutoServiceNotFoundException("Invalid service name or password");
             }
             Role role = _roleService.GetRole(autoService.RoleId);
             string token = await GenerateJwtTokenAsync(autoService, role);
@@ -89,6 +93,20 @@ namespace AutoRepairMainCore.Service.Implementations
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private void ValidatePassword(string password)
+        {
+            if (string.IsNullOrEmpty(password) ||
+                password.Length < 8 ||
+                !Regex.IsMatch(password, @"[A-Z]"))
+            {
+                string passwordRule = "Password has to be:\n" +
+                                    "At least 8 characters long.\n" +
+                                    "At least one uppercase letter.";
+
+                throw new PasswordValidateException(passwordRule);
+            }
         }
     }
 }

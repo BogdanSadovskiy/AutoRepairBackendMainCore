@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using AutoRepairMainCore.Exceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using AutoRepairMainCore.Service.Implementations;
@@ -54,6 +55,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionsHandlerMiddleware>();
 
 app.UseAuthorization();
 

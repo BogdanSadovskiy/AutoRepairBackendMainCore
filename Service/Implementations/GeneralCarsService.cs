@@ -4,6 +4,7 @@ using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using Microsoft.EntityFrameworkCore;
+using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
 
 public class GeneralCarsService : IGeneralCarsService
 {
@@ -93,6 +94,8 @@ public class GeneralCarsService : IGeneralCarsService
 
     public Car AddCar(CarDto newCar)
     {
+        IsValidCarDTO(newCar);
+   
         string formattedBrand = FormatName(newCar.Brand);
         string formattedModel = FormatName(newCar.Model);
         string formattedEngine = newCar.Engine.Trim();
@@ -100,7 +103,8 @@ public class GeneralCarsService : IGeneralCarsService
         var existingCar = CheckExistingCar(formattedBrand, formattedModel, formattedEngine);
         if (existingCar != null)
         {
-            throw new Exception($"The {formattedBrand} {formattedModel} {formattedEngine} already exists");
+            throw new CarAlreadyExistException($"The {formattedBrand} {formattedModel} {formattedEngine}" +
+                $" already exists");
         }
 
         var brandResult = AddBrand(formattedBrand);
@@ -117,6 +121,19 @@ public class GeneralCarsService : IGeneralCarsService
         _context.cars.Add(newEntityCar);
         _context.SaveChanges();
         return newEntityCar;
+    }
+
+    private bool IsValidCarDTO(CarDto car)
+    {
+        if (car == null ||
+            string.IsNullOrEmpty(car.Brand) ||
+            string.IsNullOrEmpty(car.Model) ||
+            string.IsNullOrEmpty(car.Engine)) 
+        {
+            throw new InvalidCarDataException("Fields must be not empty");
+        }
+
+        return true;
     }
 
     private Car CheckExistingCar(string brand, string model, string engine)

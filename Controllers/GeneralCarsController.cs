@@ -21,7 +21,7 @@ namespace AutoRepairMainCore.Controllers
         {
             try
             {
-                List<Brand> brands =  _generalCarsService.GetBrands();
+                List<Brand> brands = _generalCarsService.GetBrands();
                 return Ok(brands);
             }
             catch (Exception ex)
@@ -61,20 +61,8 @@ namespace AutoRepairMainCore.Controllers
         [HttpPost("addCar")]
         public async Task<IActionResult> AddCarToLibrary([FromBody] CarDto newCar)
         {
-            if (newCar == null)
-            {
-                return BadRequest("Invalid car data.");
-            }
-
-            try
-            {
-                _generalCarsService.AddCar(newCar);
-                return Ok("Car added successfully.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error adding car to the library: {ex.Message}");
-            }
+            _generalCarsService.AddCar(newCar);
+            return Ok("Car added successfully.");
         }
     }
 }
