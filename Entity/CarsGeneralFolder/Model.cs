@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.CarsGeneralFolder
 {
+    [Table("models")]
     public class Model
     {
         [Key]

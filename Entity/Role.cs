@@ -1,4 +1,4 @@
-﻿using AutoRepairMainCore.DTO;
+﻿using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.ServiceFolder;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

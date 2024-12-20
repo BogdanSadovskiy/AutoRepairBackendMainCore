@@ -1,4 +1,4 @@
-﻿namespace AutoRepairMainCore.DTO
+﻿namespace AutoRepairMainCore.DTO.Models
 {
     public enum RolesEnum
     {

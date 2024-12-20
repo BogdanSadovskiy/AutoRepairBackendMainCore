@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ErrorCodesGeneralFolder
 {
+    [Table("error_codes")]
     public class ErrorCode
     {
         [Key]
@@ -15,7 +16,7 @@ namespace AutoRepairMainCore.Entity.ErrorCodesGeneralFolder
         [Column("description")]
         public string Description { get; set; } = string.Empty;
   
-        [ForeignKey("block_id")]
+        [ForeignKey("BlockId")]
         public Block Block { get; set; }
     }
 }

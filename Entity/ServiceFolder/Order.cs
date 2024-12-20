@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
+    [Table("orders")]
     public class Order
     {
         [Key]
@@ -23,9 +24,9 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Column("employee_income")]
         public decimal? EmployeeIncome { get; set; }
 
-        [ForeignKey("client_car_id")]
+        [ForeignKey("ClientCarId")]
         public ClientCar ClientCar { get; set; }
-        [ForeignKey("employee_id")]
+        [ForeignKey("EmployeeId")]
         public Employee Employee { get; set; }
     }
 }

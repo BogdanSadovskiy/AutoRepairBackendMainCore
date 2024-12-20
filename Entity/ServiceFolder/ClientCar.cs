@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
+    [Table("client_car")]
     public class ClientCar
     {
         [Key]
@@ -14,7 +15,7 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Column("vin_code")]
         public string VinCode { get; set; } = string.Empty;
 
-        [ForeignKey("car_id")]
+        [ForeignKey("CarId")]
         public Car Car { get; set; }
     }
 }

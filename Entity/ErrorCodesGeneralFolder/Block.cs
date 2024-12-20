@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ErrorCodesGeneralFolder
 {
+    [Table("blocks")]
     public class Block
     {
         [Key]

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.CarsGeneralFolder
 {
+    [Table("cars")]
     public class Car
     {
         [Key]
@@ -15,13 +16,13 @@ namespace AutoRepairMainCore.Entity.CarsGeneralFolder
         [Column ("engine_id")]
         public int EngineId { get; set; }
 
-        [ForeignKey("brand_id")]
+        [ForeignKey("BrandId")]
         public Brand Brand { get; set; }
 
-        [ForeignKey("model_id")]
+        [ForeignKey("ModelId")]
         public Model Model { get; set; }
 
-        [ForeignKey("engine_id")]
+        [ForeignKey("EngineId")]
         public Engine Engine { get; set; }
     }
 }

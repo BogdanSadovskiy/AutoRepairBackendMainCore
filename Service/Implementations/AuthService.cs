@@ -1,12 +1,14 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Entity;
 using AutoRepairMainCore.Entity.ServiceFolder;
+using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AutoRepairMainCore.Service.Implementations
 {
@@ -15,24 +17,30 @@ namespace AutoRepairMainCore.Service.Implementations
     {
         private IConfiguration _configuration;
         private MySqlContext _context;
+        private ITokenValidationService _tokenValidationService;
         IRoleService _roleService;
 
 
-        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService)
+        public AuthService(IConfiguration configuration, MySqlContext context, 
+            IRoleService roleService, ITokenValidationService tokenValidationService)
         {
             _configuration = configuration;
             _context = context;
             _roleService = roleService;
+            _tokenValidationService = tokenValidationService;
         }
 
 
         public async Task<string> RegisterServiceAsync(AutoServiceAuthDto userAutoService)
         {
+            ValidatePassword(userAutoService.Password);
+
             if (await GetExistingService(userAutoService.Name) != null)
             {
-                throw new InvalidOperationException($"A service \"{userAutoService.Name}\" already exists.");
+                throw new AutoServiceAlreadyExistException($"A service \"{userAutoService.Name}\" already exists.");
             }
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password).ToString();
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password);
 
             AutoService myService = new AutoService
             {
@@ -43,8 +51,7 @@ namespace AutoRepairMainCore.Service.Implementations
 
             _context.services.Add(myService);
             await _context.SaveChangesAsync();
-
-            return "Service registered successfully!";
+            return $"Service {myService.Name} registered successfully!";
         }
 
         private async Task<AutoService> GetExistingService(string AutoServiceName)
@@ -57,38 +64,30 @@ namespace AutoRepairMainCore.Service.Implementations
             AutoService autoService = await GetExistingService(userAutoService.Name);
             if (autoService == null)
             {
-                throw new InvalidOperationException("Invalid service name or password");
+                throw new AutoServiceNotFoundException("Invalid service name or password");
             }
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userAutoService.Password, autoService.Password);
             if (!isPasswordValid)
             {
-                throw new InvalidOperationException("Invalid service name or password");
+                throw new AutoServiceNotFoundException("Invalid service name or password");
             }
             Role role = _roleService.GetRole(autoService.RoleId);
-            string token = await GenerateJwtTokenAsync(autoService, role);
+            string token = _tokenValidationService.GenerateToken(autoService, role);
             return token;
         }
 
-
-        public async Task<string> GenerateJwtTokenAsync(AutoService AutoService, Role role)
+        private void ValidatePassword(string password)
         {
-            List<Claim> claims = new List<Claim>
+            if (string.IsNullOrEmpty(password) ||
+                password.Length < 8 ||
+                !Regex.IsMatch(password, @"[A-Z]"))
             {
-                new Claim(ClaimTypes.Name, AutoService.Name),
-                new Claim(ClaimTypes.Role, role.Name),
-            };
+                string passwordRule = "Password has to be:\n" +
+                                    "At least 8 characters long.\n" +
+                                    "At least one uppercase letter.";
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddHours(48),
-                signingCredentials: creds
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                throw new PasswordValidateException(passwordRule);
+            }
         }
     }
 }

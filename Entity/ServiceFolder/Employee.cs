@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
+    [Table("employees")]
     public class Employee
     {
         [Key]
@@ -17,7 +18,7 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Column ("currently_working")]
         public bool CurrentlyWorking { get; set; }
 
-        [ForeignKey("autoservice_id")]
+        [ForeignKey("AutoServiceId")]
         public AutoService AutoService { get; set; }
     }
 }

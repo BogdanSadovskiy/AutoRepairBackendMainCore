@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using AutoRepairMainCore.Exceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using AutoRepairMainCore.Service.Implementations;
@@ -40,6 +41,8 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IGeneralCarsService, GeneralCarsService>();
+builder.Services.AddScoped<ITokenValidationService, TokenValidationService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -53,6 +56,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionsHandlerMiddleware>();
 
 app.UseAuthorization();
 

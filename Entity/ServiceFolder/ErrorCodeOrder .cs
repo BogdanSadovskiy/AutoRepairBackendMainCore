@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoRepairMainCore.Entity.ServiceFolder
 {
+    [Table("error_code_orders")]
     public class ErrorCodeOrder
     {
         [Key]
@@ -16,10 +17,10 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Column("data")]
         public DateTime Date { get; set; }
 
-        [ForeignKey("order_id")]
+        [ForeignKey("OrderId")]
         public Order order { get; set; }
 
-        [ForeignKey("error_code_id")]
+        [ForeignKey("ErrorCodeId")]
         public ErrorCode errorCode { get; set; }
     }
 }
