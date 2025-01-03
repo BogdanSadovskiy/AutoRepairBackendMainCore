@@ -48,7 +48,7 @@ public class ExceptionResponseHelper
                 return (HttpStatusCode.BadRequest, exception.Message);
 
             default:
-                return (HttpStatusCode.InternalServerError, "Something went wrong");
+                return (HttpStatusCode.InternalServerError, exception.Message);
         }
     }
 }

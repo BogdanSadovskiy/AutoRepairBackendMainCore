@@ -26,5 +26,7 @@ namespace AutoRepairMainCore.Service
         CarResults<Engine> AddEngine(string engine);
 
         Car AddCar(CarDto newCar);
+
+        Task<CarDto> OpenAICarValidation(CarDto car);
     }
 }

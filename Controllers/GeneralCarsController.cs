@@ -71,5 +71,15 @@ namespace AutoRepairMainCore.Controllers
             _generalCarsService.AddCar(newCar);
             return Ok("Car added successfully.");
         }
+
+        [HttpPost("openAICarValidation")]
+        public async Task<IActionResult> GPTValidation (
+            [FromBody] CarDto car,
+            [FromHeader(Name = "Authorization")] string token)
+        {
+            _tokenValidationService.ValidateToken(token);
+            CarDto validatedCar = await _generalCarsService.OpenAICarValidation(car);
+            return Ok(new {data = validatedCar, message = "OpenAI response" });
+        }
     }
 }
