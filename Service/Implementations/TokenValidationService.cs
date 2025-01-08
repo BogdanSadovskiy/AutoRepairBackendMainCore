@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoRepairMainCore.DTO.Models;
 
 namespace AutoRepairMainCore.Service.Implementations
 {
@@ -37,7 +38,7 @@ namespace AutoRepairMainCore.Service.Implementations
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public bool ValidateToken(string token)
+        public bool ValidateToken(string token, RolesEnum expectedRole)
         {
             IsTokenEmpty(token); 
             token = RemovePrefixOfToken(token);
@@ -62,12 +63,29 @@ namespace AutoRepairMainCore.Service.Implementations
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
 
-                tokenHandler.ValidateToken(token, validationParameters, out _);
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+                CheckRole(principal, expectedRole);
+
                 return true; 
             }
-            catch
+            catch(SecurityTokenException e)
             {
-                throw new SecurityTokenException("Authorization is not ok");
+                throw new SecurityTokenException(e.Message);
+            }
+        }
+
+        private void CheckRole(ClaimsPrincipal principal, RolesEnum expectedRole)
+        {
+            var roleClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+            if (roleClaim == null)
+            {
+                throw new SecurityTokenException("Token does not contain a role claim."); //буде "access denied", але тимчасово є так
+            }
+
+            if (expectedRole != Role.getEnumRole(roleClaim.Value))
+            {
+                throw new SecurityTokenException($"Wrong Role.");
             }
         }
 

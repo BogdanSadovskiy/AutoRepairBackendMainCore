@@ -1,4 +1,5 @@
 ﻿using AutoRepairMainCore.DTO;
+using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +68,7 @@ namespace AutoRepairMainCore.Controllers
             [FromBody] CarDto newCar,
             [FromHeader(Name = "Authorization")] string token)
         {
-            _tokenValidationService.ValidateToken(token);
+            _tokenValidationService.ValidateToken(token, RolesEnum.admin);
             _generalCarsService.AddCar(newCar);
             return Ok("Car added successfully.");
         }
@@ -77,7 +78,7 @@ namespace AutoRepairMainCore.Controllers
             [FromBody] CarDto car,
             [FromHeader(Name = "Authorization")] string token)
         {
-            _tokenValidationService.ValidateToken(token);
+            _tokenValidationService.ValidateToken(token, RolesEnum.admin);
             CarDto validatedCar = await _generalCarsService.OpenAICarValidation(car);
             return Ok(new {data = validatedCar, message = "OpenAI response" });
         }
