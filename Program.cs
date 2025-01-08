@@ -10,10 +10,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+string mySqlConnectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+string OpenAiMicroServiceConnectionString = builder.Configuration.GetConnectionString("OpenAIConnection");
+
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
 builder.Services.AddDbContext<MySqlContext>(options =>
-options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+options.UseMySql(mySqlConnectionString, ServerVersion.AutoDetect(mySqlConnectionString))
               .EnableSensitiveDataLogging()
               .LogTo(Console.WriteLine));
 
@@ -36,6 +39,11 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+});
+
+builder.Services.AddHttpClient("OpenAIMicroServiceClient", client =>
+{
+    client.BaseAddress =new Uri(OpenAiMicroServiceConnectionString);
 });
 
 builder.Services.AddControllers();

@@ -1,18 +1,24 @@
-﻿using AutoRepairMainCore.DTO.Models;
-using AutoRepairMainCore.DTO;
+﻿using AutoRepairMainCore.DTO;
+using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
+using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using Microsoft.EntityFrameworkCore;
-using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+
 
 public class GeneralCarsService : IGeneralCarsService
 {
     private readonly MySqlContext _context;
+    private readonly HttpClient _httpClient;
 
-    public GeneralCarsService(MySqlContext context)
+    public GeneralCarsService(MySqlContext context, IHttpClientFactory httpClientFactory)
     {
         _context = context;
+        _httpClient = httpClientFactory.CreateClient("OpenAIMicroServiceClient");
     }
 
     public List<Brand> GetBrands()
@@ -95,7 +101,7 @@ public class GeneralCarsService : IGeneralCarsService
     public Car AddCar(CarDto newCar)
     {
         IsValidCarDTO(newCar);
-   
+
         string formattedBrand = FormatName(newCar.Brand);
         string formattedModel = FormatName(newCar.Model);
         string formattedEngine = newCar.Engine.Trim();
@@ -128,7 +134,7 @@ public class GeneralCarsService : IGeneralCarsService
         if (car == null ||
             string.IsNullOrEmpty(car.Brand) ||
             string.IsNullOrEmpty(car.Model) ||
-            string.IsNullOrEmpty(car.Engine)) 
+            string.IsNullOrEmpty(car.Engine))
         {
             throw new InvalidCarDataException("Fields must be not empty");
         }
@@ -166,5 +172,52 @@ public class GeneralCarsService : IGeneralCarsService
     public Engine GetEngine(string name)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<CarDto> OpenAICarValidation(CarDto car)
+    {
+        IsValidCarDTO(car);
+        try
+        {
+            string carJson = SerializeCarRequest(car);
+
+            var content = new StringContent(carJson, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/v1/car/validate", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorContent = await response.Content.ReadAsStringAsync();
+                throw new OpenAIMicroServiceException(
+                    $"Error from microservice: {response.StatusCode} - {errorContent}");
+            }
+           
+            string responseJson = await response.Content.ReadAsStringAsync();
+            return DeserializeCarResponse(responseJson); 
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    private string SerializeCarRequest(CarDto car)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = null 
+        };
+
+        return JsonSerializer.Serialize(car, options);
+    }
+
+    private CarDto DeserializeCarResponse(string responseJson)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
+        };
+
+        return JsonSerializer.Deserialize<CarDto>(responseJson, options);
     }
 }

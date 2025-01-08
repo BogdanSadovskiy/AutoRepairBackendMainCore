@@ -4,10 +4,6 @@ using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AutoRepairMainCore.Service.Implementations
