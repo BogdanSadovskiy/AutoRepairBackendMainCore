@@ -38,7 +38,7 @@ public class GeneralCarsService : IGeneralCarsService
 
     public CarResults<Brand> AddBrand(string brand)
     {
-        string formattedBrand = FormatName(brand);
+        string formattedBrand = brand.Trim();
         var existingBrand = _context.brands.FirstOrDefault(b => b.BrandName == formattedBrand);
         if (existingBrand != null)
         {
@@ -54,7 +54,7 @@ public class GeneralCarsService : IGeneralCarsService
 
     public CarResults<Model> AddModel(string model)
     {
-        string formattedModel = FormatName(model);
+        string formattedModel = model.Trim();
         var existingModel = _context.models.FirstOrDefault(m => m.ModelName == formattedModel);
         if (existingModel != null)
         {
