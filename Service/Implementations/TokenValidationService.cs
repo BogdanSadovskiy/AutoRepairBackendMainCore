@@ -76,6 +76,11 @@ namespace AutoRepairMainCore.Service.Implementations
 
         private void CheckRole(ClaimsPrincipal principal, RolesEnum expectedRole)
         {
+            if (expectedRole == RolesEnum.anyone) 
+            {
+                return; 
+            }
+
             var roleClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
             if (roleClaim == null)

@@ -55,7 +55,7 @@ namespace AutoRepairMainCore.Service.Implementations
             return await _context.services.FirstOrDefaultAsync(s => s.Name == AutoServiceName);
         }
 
-        public async Task<string> LoginServiceAsync(AutoServiceAuthDto userAutoService)
+        public async Task<AutoServiceFrontendDTO> LoginServiceAsync(AutoServiceAuthDto userAutoService)
         {
             AutoService autoService = await GetExistingService(userAutoService.Name);
             if (autoService == null)
@@ -69,7 +69,20 @@ namespace AutoRepairMainCore.Service.Implementations
             }
             Role role = _roleService.GetRole(autoService.RoleId);
             string token = _tokenValidationService.GenerateToken(autoService, role);
-            return token;
+
+            return IfSuccessfullLogin(autoService, token);
+        }
+
+        private AutoServiceFrontendDTO IfSuccessfullLogin(AutoService autoservice, string token)
+        {
+            AutoServiceFrontendDTO autoServiceFrontendDTO = new AutoServiceFrontendDTO()
+            {
+                Name = autoservice.Name,
+                Role = autoservice.Role.Name,
+                LogoPath = autoservice.serviceIconFilePath,
+                Token = token
+            };
+            return autoServiceFrontendDTO;
         }
 
         private void ValidatePassword(string password)
