@@ -80,7 +80,7 @@ namespace AutoRepairMainCore.Service.Implementations
             {
                 return; 
             }
-
+ 
             var roleClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
             if (roleClaim == null)
@@ -94,12 +94,22 @@ namespace AutoRepairMainCore.Service.Implementations
             }
         }
 
+        public string GetAutoServiceNameFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            string autoServiceName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            return autoServiceName;
+        }
+
         private string RemovePrefixOfToken(string token)
         {
             if (token.StartsWith("Bearer "))
             {
                 return token.Substring(7);
             }
+
             return token;
         }
 
@@ -109,6 +119,7 @@ namespace AutoRepairMainCore.Service.Implementations
             {
                 throw new SecurityTokenException();
             }
+
             return false;
         }
     }

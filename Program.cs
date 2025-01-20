@@ -47,10 +47,13 @@ builder.Services.AddHttpClient("OpenAIMicroServiceClient", client =>
 });
 
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IGeneralCarsService, GeneralCarsService>();
 builder.Services.AddScoped<ITokenValidationService, TokenValidationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

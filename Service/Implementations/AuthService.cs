@@ -14,16 +14,18 @@ namespace AutoRepairMainCore.Service.Implementations
         private IConfiguration _configuration;
         private MySqlContext _context;
         private ITokenValidationService _tokenValidationService;
-        IRoleService _roleService;
+        private IRoleService _roleService;
+        private IUserService _userService;
 
 
-        public AuthService(IConfiguration configuration, MySqlContext context, 
-            IRoleService roleService, ITokenValidationService tokenValidationService)
+        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService, 
+            ITokenValidationService tokenValidationService, IUserService userService)
         {
             _configuration = configuration;
             _context = context;
             _roleService = roleService;
             _tokenValidationService = tokenValidationService;
+            _userService = userService;
         }
 
 
@@ -31,33 +33,24 @@ namespace AutoRepairMainCore.Service.Implementations
         {
             ValidatePassword(userAutoService.Password);
 
-            if (await GetExistingService(userAutoService.Name) != null)
+            if (await _userService.GetAutoServiceByName(userAutoService.Name) != null)
             {
                 throw new AutoServiceAlreadyExistException($"A service \"{userAutoService.Name}\" already exists.");
             }
 
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password);
 
-            AutoService myService = new AutoService
-            {
-                Name = userAutoService.Name,
-                Password = hashedPassword,
-                RoleId = Role.setUserRole()
-            };
-
+            AutoService myService = _userService.CreateAutoService(userAutoService.Name, hashedPassword);
+            _roleService.SetRole(myService);
+      
             _context.services.Add(myService);
             await _context.SaveChangesAsync();
             return $"Service {myService.Name} registered successfully!";
         }
 
-        private async Task<AutoService> GetExistingService(string AutoServiceName)
-        {
-            return await _context.services.FirstOrDefaultAsync(s => s.Name == AutoServiceName);
-        }
-
         public async Task<AutoServiceFrontendDTO> LoginServiceAsync(AutoServiceAuthDto userAutoService)
         {
-            AutoService autoService = await GetExistingService(userAutoService.Name);
+            AutoService autoService = await _userService.GetAutoServiceByName(userAutoService.Name);
             if (autoService == null)
             {
                 throw new AutoServiceNotFoundException("Invalid service name or password");
@@ -89,6 +82,7 @@ namespace AutoRepairMainCore.Service.Implementations
         {
             if (string.IsNullOrEmpty(password) ||
                 password.Length < 8 ||
+
                 !Regex.IsMatch(password, @"[A-Z]"))
             {
                 string passwordRule = "Password has to be:\n" +

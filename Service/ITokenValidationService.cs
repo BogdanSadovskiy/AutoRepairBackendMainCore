@@ -8,5 +8,6 @@ namespace AutoRepairMainCore.Service
     {
         bool ValidateToken(string token, RolesEnum expectedRole);
         string GenerateToken(AutoService AutoService, Role role);
+        string GetAutoServiceNameFromToken(string token);
     }
 }
