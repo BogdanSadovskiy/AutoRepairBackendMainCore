@@ -107,8 +107,8 @@ namespace AutoRepairMainCore.Service.Implementations
 
         private string GetUniqueFilePath(string directoryPath, string baseFileName, string fileExtension)
         {
-            string uniqueFileName = $"{baseFileName}_{Guid.NewGuid()}{fileExtension}";
-            return Path.Combine(directoryPath, uniqueFileName);
+            string fileName = $"{baseFileName}{fileExtension}";
+            return Path.Combine(directoryPath, fileName);
         }
 
         private void SaveFile(IFormFile file, string filePath)

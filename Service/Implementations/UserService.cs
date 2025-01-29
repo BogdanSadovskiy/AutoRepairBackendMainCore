@@ -6,12 +6,10 @@ namespace AutoRepairMainCore.Service.Implementations
 {
     public class UserService : IUserService
     {
-        private IConfiguration _configuration;
         private MySqlContext _context;
 
-        public UserService(IConfiguration configuration, MySqlContext context)
+        public UserService(MySqlContext context)
         {
-            _configuration = configuration;
             _context = context;
         }
 
