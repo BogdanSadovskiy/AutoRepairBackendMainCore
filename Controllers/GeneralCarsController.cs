@@ -2,6 +2,7 @@
 using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -12,13 +13,10 @@ namespace AutoRepairMainCore.Controllers
     public class GeneralCarsController : Controller
     {
         private readonly IGeneralCarsService _generalCarsService;
-        private readonly ITokenValidationService _tokenValidationService;
 
-        public GeneralCarsController(IGeneralCarsService generalCarsService, 
-            ITokenValidationService tokenValidationService)
+        public GeneralCarsController(IGeneralCarsService generalCarsService)
         {
             _generalCarsService = generalCarsService;
-            _tokenValidationService = tokenValidationService;
         }
 
         [HttpGet("brands")]
@@ -63,22 +61,20 @@ namespace AutoRepairMainCore.Controllers
             }
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPost("addCar")]
         public async Task<IActionResult> AddCarToLibrary(
-            [FromBody] CarDto newCar,
-            [FromHeader(Name = "Authorization")] string token)
+            [FromBody] CarDto newCar)
         {
-            _tokenValidationService.ValidateToken(token, RolesEnum.admin);
             _generalCarsService.AddCar(newCar);
             return Ok("Car added successfully.");
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPost("openAICarValidation")]
         public async Task<IActionResult> GPTValidation (
-            [FromBody] CarDto car,
-            [FromHeader(Name = "Authorization")] string token)
+            [FromBody] CarDto car)
         {
-            _tokenValidationService.ValidateToken(token, RolesEnum.admin);
             CarDto validatedCar = await _generalCarsService.OpenAICarValidation(car);
             return Ok(new {data = validatedCar, message = "OpenAI response" });
         }

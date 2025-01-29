@@ -82,7 +82,6 @@ namespace AutoRepairMainCore.Service.Implementations
         {
             if (string.IsNullOrEmpty(password) ||
                 password.Length < 8 ||
-
                 !Regex.IsMatch(password, @"[A-Z]"))
             {
                 string passwordRule = "Password has to be:\n" +

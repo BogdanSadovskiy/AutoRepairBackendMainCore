@@ -18,23 +18,23 @@ namespace AutoRepairMainCore.Entity
         {
             if (role == "admin")
             {
-                return RolesEnum.admin;
+                return RolesEnum.Admin;
             }
             else if (role == "user")
             {
-                return RolesEnum.user;
+                return RolesEnum.User;
             }
             return null;
         }
 
         public static int setAdminRole()
         {
-            return (int)RolesEnum.admin;
+            return (int)RolesEnum.Admin;
         }
 
         public static int setUserRole()
         {
-            return (int)RolesEnum.user;
+            return (int)RolesEnum.User;
         }
 
     }

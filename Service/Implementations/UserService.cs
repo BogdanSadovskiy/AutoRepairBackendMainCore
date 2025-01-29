@@ -36,5 +36,11 @@ namespace AutoRepairMainCore.Service.Implementations
             _context.services.Update(autoService);
             _context.SaveChanges();
         }
+
+        public async Task<AutoService> GetAutoServiceById(int id)
+        {
+            AutoService autoService = await _context.services.FirstOrDefaultAsync(s => s.Id == id);
+            return autoService;
+        }
     }
 }
