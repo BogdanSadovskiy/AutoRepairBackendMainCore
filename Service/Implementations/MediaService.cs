@@ -1,5 +1,6 @@
 ﻿using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.ServiceFolder;
+using System.IO;
 
 namespace AutoRepairMainCore.Service.Implementations
 {
@@ -13,11 +14,11 @@ namespace AutoRepairMainCore.Service.Implementations
 
         private void InitiateListsOfExtentions()
         {
-            baseDirectory = "../AutoServices";
+            baseDirectory = Path.GetFullPath("../AutoServices"); 
 
             imageExtensions = new List<string>
             {
-                ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".svg"
+                ".jpg", ".jpeg", ".png", ".bmp", ".webp"
             };
 
             videoExtensions = new List<string>
@@ -40,23 +41,25 @@ namespace AutoRepairMainCore.Service.Implementations
             string fileExtension = GetFileExtension(logoFile);
             CheckFileExtension(fileExtension, MediaType.image);
 
-            string baseFileName = $"{autoService.Name}'s_Logo";
-            string relativePath = $"{autoService.Name}/Logo";
+            string baseFileName = $"{autoService.Name}_Logo";
+            string relativePath = Path.Combine(autoService.Name, "Logo");
             string directoryPath = CreateDirectory(relativePath);
             string filePath = GetUniqueFilePath(directoryPath, baseFileName, fileExtension);
 
             SaveFile(logoFile, filePath);
-            _userService.UpdateAutoServiceLogoPath(autoService, filePath);
 
-            return filePath;
+            string relativeFilePath = ConvertToRelativePath(filePath);
+            _userService.UpdateAutoServiceLogoPath(autoService, relativeFilePath);
+
+            return relativeFilePath;
         }
+
         private bool IsFileEmpty(IFormFile file)
         {
             if (file == null)
             {
-                throw new InvalidOperationException("No file");
+                throw new InvalidOperationException("No file uploaded.");
             }
-
             return true;
         }
 
@@ -74,16 +77,15 @@ namespace AutoRepairMainCore.Service.Implementations
         {
             if (expectedType == MediaType.image)
             {
-                if (!imageExtensions.Contains(fileExtension))
+                if (!imageExtensions.Contains(fileExtension.ToLower()))
                 {
                     throw new InvalidOperationException($"Invalid file extension. " +
                         $"Allowed image extensions are: {string.Join(", ", imageExtensions)}");
                 }
             }
-
             else if (expectedType == MediaType.video)
             {
-                if (!videoExtensions.Contains(fileExtension))
+                if (!videoExtensions.Contains(fileExtension.ToLower()))
                 {
                     throw new InvalidOperationException($"Invalid file extension. " +
                         $"Allowed video extensions are: {string.Join(", ", videoExtensions)}");
@@ -96,6 +98,7 @@ namespace AutoRepairMainCore.Service.Implementations
         private string CreateDirectory(string relativePath)
         {
             string fullPath = Path.Combine(baseDirectory, relativePath);
+            fullPath = Path.GetFullPath(fullPath);
 
             if (!Directory.Exists(fullPath))
             {
@@ -108,7 +111,18 @@ namespace AutoRepairMainCore.Service.Implementations
         private string GetUniqueFilePath(string directoryPath, string baseFileName, string fileExtension)
         {
             string fileName = $"{baseFileName}{fileExtension}";
-            return Path.Combine(directoryPath, fileName);
+            string filePath = Path.Combine(directoryPath, fileName);
+            return Path.GetFullPath(filePath);
+        }
+
+        private string ConvertToRelativePath(string fullPath)
+        {
+            if (fullPath.StartsWith(baseDirectory, StringComparison.OrdinalIgnoreCase))
+            {
+                string relativePath = fullPath.Substring(baseDirectory.Length).TrimStart(Path.DirectorySeparatorChar);
+                return relativePath.Replace("\\", "/"); 
+            }
+            return fullPath; 
         }
 
         private void SaveFile(IFormFile file, string filePath)
@@ -125,6 +139,5 @@ namespace AutoRepairMainCore.Service.Implementations
                 throw new IOException($"Failed to save the file to {filePath}.", ex);
             }
         }
-
     }
 }
