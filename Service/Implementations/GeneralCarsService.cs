@@ -5,7 +5,6 @@ using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -190,9 +189,9 @@ public class GeneralCarsService : IGeneralCarsService
                 throw new OpenAIMicroServiceException(
                     $"Error from microservice: {response.StatusCode} - {errorContent}");
             }
-           
+
             string responseJson = await response.Content.ReadAsStringAsync();
-            return DeserializeCarResponse(responseJson); 
+            return DeserializeCarResponse(responseJson);
         }
         catch (Exception)
         {
@@ -204,7 +203,7 @@ public class GeneralCarsService : IGeneralCarsService
     {
         var options = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = null 
+            PropertyNamingPolicy = null
         };
 
         return JsonSerializer.Serialize(car, options);

@@ -28,7 +28,7 @@ namespace AutoRepairMainCore.Service.Implementations
             return autoService;
         }
 
-        public void UpdateAutoServiceLogoPath(AutoService autoService,  string logoPath)
+        public void UpdateAutoServiceLogoPath(AutoService autoService, string logoPath)
         {
             autoService.serviceIconFilePath = logoPath;
             _context.services.Update(autoService);

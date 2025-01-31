@@ -1,10 +1,8 @@
 ﻿using AutoRepairMainCore.DTO;
-using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace AutoRepairMainCore.Controllers
 {
@@ -72,11 +70,11 @@ namespace AutoRepairMainCore.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpPost("openAICarValidation")]
-        public async Task<IActionResult> GPTValidation (
+        public async Task<IActionResult> GPTValidation(
             [FromBody] CarDto car)
         {
             CarDto validatedCar = await _generalCarsService.OpenAICarValidation(car);
-            return Ok(new {data = validatedCar, message = "OpenAI response" });
+            return Ok(new { data = validatedCar, message = "OpenAI response" });
         }
     }
 }

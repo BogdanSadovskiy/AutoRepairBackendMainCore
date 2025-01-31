@@ -3,7 +3,6 @@ using AutoRepairMainCore.Entity;
 using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
 namespace AutoRepairMainCore.Service.Implementations
@@ -18,7 +17,7 @@ namespace AutoRepairMainCore.Service.Implementations
         private IUserService _userService;
 
 
-        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService, 
+        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService,
             ITokenValidationService tokenValidationService, IUserService userService)
         {
             _configuration = configuration;
@@ -42,7 +41,7 @@ namespace AutoRepairMainCore.Service.Implementations
 
             AutoService myService = _userService.CreateAutoService(userAutoService.Name, hashedPassword);
             _roleService.SetRole(myService);
-      
+
             _context.services.Add(myService);
             await _context.SaveChangesAsync();
             return $"Service {myService.Name} registered successfully!";

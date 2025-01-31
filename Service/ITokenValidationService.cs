@@ -1,6 +1,5 @@
-﻿using AutoRepairMainCore.Entity.ServiceFolder;
-using AutoRepairMainCore.Entity;
-using AutoRepairMainCore.DTO.Models;
+﻿using AutoRepairMainCore.Entity;
+using AutoRepairMainCore.Entity.ServiceFolder;
 
 namespace AutoRepairMainCore.Service
 {

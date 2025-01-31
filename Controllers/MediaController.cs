@@ -1,5 +1,4 @@
-﻿using AutoRepairMainCore.DTO.Models;
-using AutoRepairMainCore.Entity.ServiceFolder;
+﻿using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,8 +27,8 @@ namespace AutoRepairMainCore.Controllers
         {
             string token = Request.Headers["Authorization"].ToString();
 
-            AutoService autoservice = await _userService.GetAutoServiceById
-                (_tokenValidationService.GetAutoServiceIdFromToken(token));
+            int userId = _tokenValidationService.GetAutoServiceIdFromToken(token);
+            AutoService autoservice = await _userService.GetAutoServiceById(userId);
 
             _mediaService.SaveAutoServiceLogo(autoservice, logoFile);
 

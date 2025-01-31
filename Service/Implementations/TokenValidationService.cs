@@ -70,7 +70,7 @@ namespace AutoRepairMainCore.Service.Implementations
             string tokenWithoutBearer = token;
             if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                tokenWithoutBearer =  token.Substring("Bearer ".Length).Trim();
+                tokenWithoutBearer = token.Substring("Bearer ".Length).Trim();
             }
             return tokenWithoutBearer;
         }

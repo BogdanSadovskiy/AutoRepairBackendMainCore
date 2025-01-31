@@ -7,7 +7,7 @@ namespace AutoRepairMainCore.Infrastructure
     {
         public MySqlContext CreateDbContext(string[] args)
         {
-           
+
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")

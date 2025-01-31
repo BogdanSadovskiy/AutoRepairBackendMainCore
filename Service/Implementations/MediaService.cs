@@ -1,6 +1,5 @@
 ﻿using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.ServiceFolder;
-using System.IO;
 
 namespace AutoRepairMainCore.Service.Implementations
 {
@@ -14,7 +13,7 @@ namespace AutoRepairMainCore.Service.Implementations
 
         private void InitiateListsOfExtentions()
         {
-            baseDirectory = Path.GetFullPath("../AutoServices"); 
+            baseDirectory = Path.GetFullPath("../AutoServices");
 
             imageExtensions = new List<string>
             {
@@ -120,9 +119,9 @@ namespace AutoRepairMainCore.Service.Implementations
             if (fullPath.StartsWith(baseDirectory, StringComparison.OrdinalIgnoreCase))
             {
                 string relativePath = fullPath.Substring(baseDirectory.Length).TrimStart(Path.DirectorySeparatorChar);
-                return relativePath.Replace("\\", "/"); 
+                return relativePath.Replace("\\", "/");
             }
-            return fullPath; 
+            return fullPath;
         }
 
         private void SaveFile(IFormFile file, string filePath)

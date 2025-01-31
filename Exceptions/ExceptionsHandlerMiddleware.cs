@@ -1,15 +1,12 @@
-﻿using System.Buffers;
-using System.Net;
-
-namespace AutoRepairMainCore.Exceptions
+﻿namespace AutoRepairMainCore.Exceptions
 {
     public class ExceptionsHandlerMiddleware
     {
         private readonly RequestDelegate _requestDelegate;
 
-        public ExceptionsHandlerMiddleware(RequestDelegate requestDelegate) 
+        public ExceptionsHandlerMiddleware(RequestDelegate requestDelegate)
         {
-        _requestDelegate = requestDelegate;
+            _requestDelegate = requestDelegate;
         }
 
         public async Task Invoke(HttpContext context)

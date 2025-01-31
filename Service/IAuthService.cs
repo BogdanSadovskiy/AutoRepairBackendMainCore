@@ -1,6 +1,4 @@
 ﻿using AutoRepairMainCore.DTO;
-using AutoRepairMainCore.Entity;
-using AutoRepairMainCore.Entity.ServiceFolder;
 namespace AutoRepairMainCore.Service
 {
     public interface IAuthService
