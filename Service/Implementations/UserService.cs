@@ -1,6 +1,9 @@
-﻿using AutoRepairMainCore.Entity.ServiceFolder;
+﻿using AutoRepairMainCore.DTO;
+using AutoRepairMainCore.Entity.ServiceFolder;
+using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace AutoRepairMainCore.Service.Implementations
 {
@@ -15,9 +18,9 @@ namespace AutoRepairMainCore.Service.Implementations
 
         public AutoService CreateAutoService(string name, string password)
         {
-            return  new AutoService() 
+            return new AutoService()
             {
-                Name = name, 
+                Name = name,
                 Password = password
             };
         }
