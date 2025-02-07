@@ -4,6 +4,7 @@
     {
         public CarAlreadyExistException(string message) : base(message) { }
         public CarAlreadyExistException(string message, Exception innerException) :
-            base(message, innerException) { }
+            base(message, innerException)
+        { }
     }
 }

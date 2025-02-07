@@ -1,4 +1,5 @@
 ﻿using AutoRepairMainCore.Entity;
+using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Infrastructure;
 
 namespace AutoRepairMainCore.Service.Implementations
@@ -24,6 +25,11 @@ namespace AutoRepairMainCore.Service.Implementations
             }
 
             return role;
+        }
+
+        public void SetRole(AutoService autoService)
+        {
+            autoService.RoleId = Role.setUserRole();
         }
     }
 }

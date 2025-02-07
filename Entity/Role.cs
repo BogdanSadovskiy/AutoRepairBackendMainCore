@@ -14,27 +14,27 @@ namespace AutoRepairMainCore.Entity
         public string Name { get; set; }
         public ICollection<AutoService> AutoServices { get; set; } = new List<AutoService>();
 
-        public RolesEnum? getEnumRole()
+        public static RolesEnum? getEnumRole(string role)
         {
-            if (this.Name == "admin")
+            if (role == "admin")
             {
-                return RolesEnum.admin;
+                return RolesEnum.Admin;
             }
-            else if (this.Name == "user")
+            else if (role == "user")
             {
-                return RolesEnum.user;
+                return RolesEnum.User;
             }
             return null;
         }
 
         public static int setAdminRole()
         {
-            return (int)RolesEnum.admin;
+            return (int)RolesEnum.Admin;
         }
 
         public static int setUserRole()
         {
-            return (int)RolesEnum.user;
+            return (int)RolesEnum.User;
         }
 
     }

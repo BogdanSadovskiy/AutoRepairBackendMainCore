@@ -1,5 +1,5 @@
-﻿using AutoRepairMainCore.Entity.ServiceFolder;
-using AutoRepairMainCore.Entity;
+﻿using AutoRepairMainCore.Entity;
+using AutoRepairMainCore.Entity.ServiceFolder;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,84 +10,69 @@ namespace AutoRepairMainCore.Service.Implementations
     public class TokenValidationService : ITokenValidationService
     {
         private readonly IConfiguration _configuration;
+        private int expiryHours;
 
         public TokenValidationService(IConfiguration configuration)
         {
             _configuration = configuration;
+            expiryHours = 24;
         }
 
         public string GenerateToken(AutoService AutoService, Role role)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, AutoService.Name),
-                new Claim(ClaimTypes.Role, role.Name),
+                new Claim(ClaimTypes.NameIdentifier, AutoService.Id.ToString()),
+                new Claim(ClaimTypes.Role, role.Name)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            string secretKey = _configuration["Jwt:Key"];
+            string issuer = _configuration["Jwt:Issuer"];
+            string audience = _configuration["Jwt:Audience"];
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddHours(48),
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(expiryHours),
                 signingCredentials: creds
             );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public bool ValidateToken(string token)
+        public int GetAutoServiceIdFromToken(string token)
         {
-            IsTokenEmpty(token); 
-            token = RemovePrefixOfToken(token);
+            token = RemoveBearerFromToken(token);
 
-            try
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var tokenS = jwtTokenHandler.ReadToken(token) as JwtSecurityToken;
+
+            if (tokenS == null)
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
-
-                var validationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = _configuration["Jwt:Issuer"],
-
-                    ValidateAudience = true,
-                    ValidAudience = _configuration["Jwt:Audience"],
-
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-
-                tokenHandler.ValidateToken(token, validationParameters, out _);
-                return true; 
+                throw new UnauthorizedAccessException("Invalid token.");
             }
-            catch
+
+            int idClaim = int.Parse(tokenS?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+
+            if (idClaim == null)
             {
-                throw new SecurityTokenException("Authorization is not ok");
+                throw new UnauthorizedAccessException("Token does not contain necessary claims.");
             }
+            return idClaim;
         }
 
-        private string RemovePrefixOfToken(string token)
+        private string RemoveBearerFromToken(string token)
         {
-            if (token.StartsWith("Bearer "))
+            string tokenWithoutBearer = token;
+            if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                return token.Substring(7);
+                tokenWithoutBearer = token.Substring("Bearer ".Length).Trim();
             }
-            return token;
-        }
-
-        private bool IsTokenEmpty(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                throw new SecurityTokenException();
-            }
-            return false;
+            return tokenWithoutBearer;
         }
     }
-    
 }

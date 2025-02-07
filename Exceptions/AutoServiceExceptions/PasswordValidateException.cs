@@ -4,7 +4,8 @@
     {
         public PasswordValidateException(string message) : base(message) { }
 
-        public PasswordValidateException(string message, Exception innerException) : 
-            base(message, innerException) { }
+        public PasswordValidateException(string message, Exception innerException) :
+            base(message, innerException)
+        { }
     }
 }

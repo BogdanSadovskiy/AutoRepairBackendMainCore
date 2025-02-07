@@ -20,26 +20,8 @@ options.UseMySql(mySqlConnectionString, ServerVersion.AutoDetect(mySqlConnection
               .EnableSensitiveDataLogging()
               .LogTo(Console.WriteLine));
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
-});
+builder.Services.ConfigureJwtAuthentication(builder.Configuration);
+builder.Services.ConfigureAuthorizationPolicies();
 
 builder.Services.AddHttpClient("OpenAIMicroServiceClient", client =>
 {
@@ -47,10 +29,13 @@ builder.Services.AddHttpClient("OpenAIMicroServiceClient", client =>
 });
 
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IGeneralCarsService, GeneralCarsService>();
 builder.Services.AddScoped<ITokenValidationService, TokenValidationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -65,9 +50,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionsHandlerMiddleware>();
+app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionsHandlerMiddleware>();
 
 app.MapControllers();
 

@@ -8,7 +8,7 @@ namespace AutoRepairMainCore.Infrastructure
 {
     public class MySqlContext : DbContext
     {
-        public MySqlContext(DbContextOptions<MySqlContext> options) : base(options){ }
+        public MySqlContext(DbContextOptions<MySqlContext> options) : base(options) { }
 
         public DbSet<Brand> brands { get; set; }
 

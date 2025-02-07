@@ -5,7 +5,6 @@ using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -38,7 +37,7 @@ public class GeneralCarsService : IGeneralCarsService
 
     public CarResults<Brand> AddBrand(string brand)
     {
-        string formattedBrand = FormatName(brand);
+        string formattedBrand = brand.Trim();
         var existingBrand = _context.brands.FirstOrDefault(b => b.BrandName == formattedBrand);
         if (existingBrand != null)
         {
@@ -54,7 +53,7 @@ public class GeneralCarsService : IGeneralCarsService
 
     public CarResults<Model> AddModel(string model)
     {
-        string formattedModel = FormatName(model);
+        string formattedModel = model.Trim();
         var existingModel = _context.models.FirstOrDefault(m => m.ModelName == formattedModel);
         if (existingModel != null)
         {
@@ -101,21 +100,18 @@ public class GeneralCarsService : IGeneralCarsService
     public Car AddCar(CarDto newCar)
     {
         IsValidCarDTO(newCar);
+        FormatCar(newCar);
 
-        string formattedBrand = FormatName(newCar.Brand);
-        string formattedModel = FormatName(newCar.Model);
-        string formattedEngine = newCar.Engine.Trim();
-
-        var existingCar = CheckExistingCar(formattedBrand, formattedModel, formattedEngine);
+        var existingCar = CheckExistingCar(newCar.Brand, newCar.Model, newCar.Engine);
         if (existingCar != null)
         {
-            throw new CarAlreadyExistException($"The {formattedBrand} {formattedModel} {formattedEngine}" +
+            throw new CarAlreadyExistException($"The {newCar.Brand} {newCar.Model} {newCar.Engine}" +
                 $" already exists");
         }
 
-        var brandResult = AddBrand(formattedBrand);
-        var modelResult = AddModel(formattedModel);
-        var engineResult = AddEngine(formattedEngine);
+        var brandResult = AddBrand(newCar.Brand);
+        var modelResult = AddModel(newCar.Model);
+        var engineResult = AddEngine(newCar.Engine);
 
         var newEntityCar = new Car
         {
@@ -153,10 +149,13 @@ public class GeneralCarsService : IGeneralCarsService
                                  c.Engine.EngineDescription == engine);
     }
 
-    private string FormatName(string name)
+    private CarDto FormatCar(CarDto car)
     {
-        name = name.Trim();
-        return char.ToUpper(name[0]) + name.Substring(1).ToLower();
+        car.Brand.Trim();
+        car.Model.Trim();
+        car.Engine.Trim();
+
+        return car;
     }
 
     public Brand GetBrand(string name)
@@ -190,9 +189,9 @@ public class GeneralCarsService : IGeneralCarsService
                 throw new OpenAIMicroServiceException(
                     $"Error from microservice: {response.StatusCode} - {errorContent}");
             }
-           
+
             string responseJson = await response.Content.ReadAsStringAsync();
-            return DeserializeCarResponse(responseJson); 
+            return DeserializeCarResponse(responseJson);
         }
         catch (Exception)
         {
@@ -204,7 +203,7 @@ public class GeneralCarsService : IGeneralCarsService
     {
         var options = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = null 
+            PropertyNamingPolicy = null
         };
 
         return JsonSerializer.Serialize(car, options);

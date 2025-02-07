@@ -25,8 +25,8 @@ namespace AutoRepairMainCore.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AutoServiceAuthDto userService)
         {
-            string token = await _authService.LoginServiceAsync(userService);
-            return Ok(new { Token = token });
+            AutoServiceFrontendDTO autoService = await _authService.LoginServiceAsync(userService);
+            return Ok(autoService);
         }
     }
 }

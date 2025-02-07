@@ -3,7 +3,6 @@ using AutoRepairMainCore.Entity;
 using AutoRepairMainCore.Entity.ServiceFolder;
 using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
 namespace AutoRepairMainCore.Service.Implementations
@@ -14,16 +13,18 @@ namespace AutoRepairMainCore.Service.Implementations
         private IConfiguration _configuration;
         private MySqlContext _context;
         private ITokenValidationService _tokenValidationService;
-        IRoleService _roleService;
+        private IRoleService _roleService;
+        private IUserService _userService;
 
 
-        public AuthService(IConfiguration configuration, MySqlContext context, 
-            IRoleService roleService, ITokenValidationService tokenValidationService)
+        public AuthService(IConfiguration configuration, MySqlContext context, IRoleService roleService,
+            ITokenValidationService tokenValidationService, IUserService userService)
         {
             _configuration = configuration;
             _context = context;
             _roleService = roleService;
             _tokenValidationService = tokenValidationService;
+            _userService = userService;
         }
 
 
@@ -31,33 +32,24 @@ namespace AutoRepairMainCore.Service.Implementations
         {
             ValidatePassword(userAutoService.Password);
 
-            if (await GetExistingService(userAutoService.Name) != null)
+            if (await _userService.GetAutoServiceByName(userAutoService.Name) != null)
             {
                 throw new AutoServiceAlreadyExistException($"A service \"{userAutoService.Name}\" already exists.");
             }
 
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password);
 
-            AutoService myService = new AutoService
-            {
-                Name = userAutoService.Name,
-                Password = hashedPassword,
-                RoleId = Role.setUserRole()
-            };
+            AutoService myService = _userService.CreateAutoService(userAutoService.Name, hashedPassword);
+            _roleService.SetRole(myService);
 
             _context.services.Add(myService);
             await _context.SaveChangesAsync();
             return $"Service {myService.Name} registered successfully!";
         }
 
-        private async Task<AutoService> GetExistingService(string AutoServiceName)
+        public async Task<AutoServiceFrontendDTO> LoginServiceAsync(AutoServiceAuthDto userAutoService)
         {
-            return await _context.services.FirstOrDefaultAsync(s => s.Name == AutoServiceName);
-        }
-
-        public async Task<string> LoginServiceAsync(AutoServiceAuthDto userAutoService)
-        {
-            AutoService autoService = await GetExistingService(userAutoService.Name);
+            AutoService autoService = await _userService.GetAutoServiceByName(userAutoService.Name);
             if (autoService == null)
             {
                 throw new AutoServiceNotFoundException("Invalid service name or password");
@@ -69,7 +61,20 @@ namespace AutoRepairMainCore.Service.Implementations
             }
             Role role = _roleService.GetRole(autoService.RoleId);
             string token = _tokenValidationService.GenerateToken(autoService, role);
-            return token;
+
+            return IfSuccessfullLogin(autoService, token);
+        }
+
+        private AutoServiceFrontendDTO IfSuccessfullLogin(AutoService autoservice, string token)
+        {
+            AutoServiceFrontendDTO autoServiceFrontendDTO = new AutoServiceFrontendDTO()
+            {
+                Name = autoservice.Name,
+                Role = autoservice.Role.Name,
+                LogoPath = autoservice.serviceIconFilePath,
+                Token = token
+            };
+            return autoServiceFrontendDTO;
         }
 
         private void ValidatePassword(string password)
