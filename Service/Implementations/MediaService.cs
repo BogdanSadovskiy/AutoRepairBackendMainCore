@@ -1,5 +1,4 @@
-﻿using AutoRepairMainCore.DTO;
-using AutoRepairMainCore.DTO.Models;
+﻿using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.ServiceFolder;
 
 namespace AutoRepairMainCore.Service.Implementations
@@ -63,7 +62,7 @@ namespace AutoRepairMainCore.Service.Implementations
             {
                 return null;
             }
-            
+
             string fileExtension = GetFileExtension(photo);
             CheckFileExtension(fileExtension, MediaType.image);
 
@@ -74,9 +73,8 @@ namespace AutoRepairMainCore.Service.Implementations
 
             SaveFile(photo, filePath);
 
-            return  ConvertToRelativePath(filePath);
+            return ConvertToRelativePath(filePath);
         }
-
 
         private bool IsFileEmpty(IFormFile file)
         {
