@@ -1,6 +1,5 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
-using AutoRepairMainCore.Entity.ErrorCodesGeneralFolder;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +75,7 @@ namespace AutoRepairMainCore.Controllers
             return Ok(new { data = validatedCar, message = "OpenAI response" });
         }
 
-        [Authorize(Policy ="Admin")]
+        [Authorize(Policy = "Admin")]
         [HttpPost("addECU")]
         public async Task<IActionResult> AddECU([FromBody] List<string>? names)
         {

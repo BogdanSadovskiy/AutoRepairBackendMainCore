@@ -10,15 +10,12 @@ namespace AutoRepairMainCore.Controllers
     [Route("api/v1/[controller]")]
     public class UserController : Controller
     {
-        private ITokenValidationService _tokenValidationService;
         private IUserService _userService;
         private IMediaService _mediaService;
         private IEmployeeService _employeeService;
 
-        public UserController(ITokenValidationService tokenValidationService,
-            IUserService userService, IEmployeeService employeeService, IMediaService mediaService)
+        public UserController(IUserService userService, IEmployeeService employeeService, IMediaService mediaService)
         {
-            _tokenValidationService = tokenValidationService;
             _userService = userService;
             _mediaService = mediaService;
             _employeeService = employeeService;
@@ -26,10 +23,8 @@ namespace AutoRepairMainCore.Controllers
 
         [Authorize(Policy = "AdminOrUser")]
         [HttpPost("add-employee")]
-        public async Task<IActionResult> CreateEmployee([FromForm] EmployeeDto employee)
+        public async Task<IActionResult> CreateEmployee([FromForm] int userId, EmployeeDto employee)
         {
-            string token = Request.Headers["Authorization"].ToString();
-            int userId = _tokenValidationService.GetAutoServiceIdFromToken(token);
             AutoService autoService = await _userService.GetAutoServiceById(userId);
             Employee createdEmployee = _employeeService.CreateEmployee(autoService, employee);
 
@@ -44,10 +39,8 @@ namespace AutoRepairMainCore.Controllers
 
         [Authorize(Policy = "AdminOrUser")]
         [HttpPost("update-employee")]
-        public async Task<IActionResult> UpdateEmployee([FromForm] UpdateEmployeeDto employee)
+        public async Task<IActionResult> UpdateEmployee([FromForm] int userId, UpdateEmployeeDto employee)
         {
-            string token = Request.Headers["Authorization"].ToString();
-            int userId = _tokenValidationService.GetAutoServiceIdFromToken(token);
             Employee existingEmployee = _employeeService.FindEmployeeById(userId, employee.Id);
             string photoPath = "";
 

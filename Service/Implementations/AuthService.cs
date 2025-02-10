@@ -69,6 +69,7 @@ namespace AutoRepairMainCore.Service.Implementations
         {
             AutoServiceFrontendDTO autoServiceFrontendDTO = new AutoServiceFrontendDTO()
             {
+                Id = autoservice.Id,
                 Name = autoservice.Name,
                 Role = autoservice.Role.Name,
                 LogoPath = autoservice.serviceIconFilePath,
