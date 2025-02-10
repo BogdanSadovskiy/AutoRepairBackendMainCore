@@ -38,6 +38,7 @@ builder.Services.AddScoped<ITokenValidationService, TokenValidationService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
@@ -49,6 +50,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterType<EmployeeService>().As<IEmployeeService>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<MediaService>().As<IMediaService>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<OrderService>().As<IOrderService>().InstancePerLifetimeScope();
 });
 
 builder.Services.AddEndpointsApiExplorer();

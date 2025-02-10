@@ -1,5 +1,6 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
+using AutoRepairMainCore.Entity.ErrorCodesGeneralFolder;
 using AutoRepairMainCore.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -61,20 +62,26 @@ namespace AutoRepairMainCore.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpPost("addCar")]
-        public async Task<IActionResult> AddCarToLibrary(
-            [FromBody] CarDto newCar)
+        public async Task<IActionResult> AddCarToLibrary([FromBody] CarDto newCar)
         {
-            _generalCarsService.AddCar(newCar);
-            return Ok("Car added successfully.");
+            Car car = _generalCarsService.AddCar(newCar);
+            return Ok(car);
         }
 
         [Authorize(Policy = "Admin")]
         [HttpPost("openAICarValidation")]
-        public async Task<IActionResult> GPTValidation(
-            [FromBody] CarDto car)
+        public async Task<IActionResult> GPTValidation([FromBody] CarDto car)
         {
             CarDto validatedCar = await _generalCarsService.OpenAICarValidation(car);
             return Ok(new { data = validatedCar, message = "OpenAI response" });
+        }
+
+        [Authorize(Policy ="Admin")]
+        [HttpPost("addECU")]
+        public async Task<IActionResult> AddECU([FromBody] List<string>? names)
+        {
+            CreatingECUDto ecu = _generalCarsService.AddBlock(names);
+            return Ok(ecu);
         }
     }
 }

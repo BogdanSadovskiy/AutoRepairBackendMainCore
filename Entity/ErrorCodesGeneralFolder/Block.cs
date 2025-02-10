@@ -11,7 +11,5 @@ namespace AutoRepairMainCore.Entity.ErrorCodesGeneralFolder
         public int Id { get; set; }
         [Column("block_name")]
         public string BlockName { get; set; } = string.Empty;
-
-        public ICollection<ErrorCode> ErrorCodes { get; set; } = new List<ErrorCode>();
     }
 }

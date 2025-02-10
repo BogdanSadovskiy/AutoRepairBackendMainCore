@@ -32,6 +32,10 @@ namespace AutoRepairMainCore.Infrastructure
 
         public DbSet<ErrorCodeOrder> errorCodeOrders { get; set; }
 
+        public DbSet<Client> clients { get; set; }
+
         public DbSet<Order> orders { get; set; }
+
+        public DbSet<OrderFile> ordersFiles { get; set; }
     }
 }

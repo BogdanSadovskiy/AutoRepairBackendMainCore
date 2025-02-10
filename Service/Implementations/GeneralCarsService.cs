@@ -1,6 +1,8 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
+using AutoRepairMainCore.Entity.ErrorCodesGeneralFolder;
+using AutoRepairMainCore.Exceptions.AutoServiceExceptions;
 using AutoRepairMainCore.Exceptions.GeneralCarsExceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
@@ -218,5 +220,95 @@ public class GeneralCarsService : IGeneralCarsService
         };
 
         return JsonSerializer.Deserialize<CarDto>(responseJson, options);
+    }
+
+    public CreatingECUDto AddBlock(List<string> newNames)
+    {
+        if (newNames == null || !newNames.Any())
+        {
+            throw new InvalidParameterException("No any ECUs to add.");
+        }
+        CreatingECUDto ecu = new CreatingECUDto()
+        {
+            ECUs = new List<Block>(),
+            Logger = "Info about saving ECU\n"
+        };
+        
+        foreach(string block in newNames)
+        {
+            Block? existingBlock = _context.blocks.FirstOrDefault(b => b.BlockName == block);
+            if (existingBlock != null)
+            {
+                ecu.Logger += $"{block} already exists.\n";
+                continue;
+            }
+
+            Block newBlock = new Block()
+            {
+                BlockName = block
+            };
+            _context.blocks.Add(newBlock);
+            ecu.ECUs.Add(newBlock);
+            ecu.Logger += $"{block} added.\n";
+        }
+        _context.SaveChanges();
+        return ecu;
+    }
+
+    public ErrorCode? FindErrorCodeByName(string code)
+    {
+        return _context.errorCodes.FirstOrDefault(e => e.Code == code);
+    }
+
+    public ErrorCode? FindErrorCodeById(int id)
+    {
+        return _context.errorCodes.FirstOrDefault(e => e.Id == id);
+    }
+
+    public ErrorCode UpdateErrorCodeDescription(int errorCodeId, string description)
+    {
+        ErrorCode? errorCode = FindErrorCodeById(errorCodeId);
+        if(errorCode == null)
+        {
+            throw new InvalidParameterException("Can not find errorCode");
+        }
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            throw new InvalidParameterException("Empty description");
+        }
+        ErrorCode? existingErrorCode = FindErrorCodeById(errorCodeId);
+        if(existingErrorCode == null)
+        {
+            throw new InvalidParameterException("Cannot find errorCode in database");
+        }
+        existingErrorCode.Description = description;
+        _context.errorCodes.Update(existingErrorCode);
+        _context.SaveChanges();
+        return existingErrorCode;
+    }
+
+    public ErrorCode AddErrorCode(int? blockId, string code, string? description)
+    {
+        if (string.IsNullOrWhiteSpace(code) || !blockId.HasValue)
+        {
+            throw new InvalidParameterException("Empty code or block fields");
+        }
+        ErrorCode? existingErrorCode = FindErrorCodeByName(code);
+
+        if(existingErrorCode != null) 
+        {
+            throw new InvalidParameterException("Error code already exists");
+        }
+
+        ErrorCode errorCode = new ErrorCode()
+        {
+            BlockId = (int)blockId,
+            Code = code,
+            Description = description
+        };
+
+        _context.errorCodes.Add(errorCode);
+        _context.SaveChanges();
+        return errorCode;
     }
 }

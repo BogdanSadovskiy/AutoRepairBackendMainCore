@@ -9,6 +9,8 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Key]
         [Column("id")]
         public int Id { get; set; }
+        [Column("client_id")]
+        public int ClientId { get; set; }
         [Column("client_car_id")]
         public int ClientCarId { get; set; }
         [Column ("employee_id")]
@@ -28,5 +30,8 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         public ClientCar ClientCar { get; set; }
         [ForeignKey("EmployeeId")]
         public Employee Employee { get; set; }
+
+        public ICollection<OrderFile> OrderFiles { get; set; } = new List<OrderFile>();
+
     }
 }

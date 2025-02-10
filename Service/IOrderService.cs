@@ -1,6 +1,6 @@
 ﻿namespace AutoRepairMainCore.Service
 {
-    public interface IClientCarService
+    public interface IOrderService
     {
     }
 }

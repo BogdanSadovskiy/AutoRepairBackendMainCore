@@ -1,6 +1,7 @@
 ﻿using AutoRepairMainCore.DTO;
 using AutoRepairMainCore.DTO.Models;
 using AutoRepairMainCore.Entity.CarsGeneralFolder;
+using AutoRepairMainCore.Entity.ErrorCodesGeneralFolder;
 
 namespace AutoRepairMainCore.Service
 {
@@ -18,14 +19,10 @@ namespace AutoRepairMainCore.Service
 
         Engine GetEngine(string name);
 
-        CarResults<Brand> AddBrand(string brand);
-
-        CarResults<Model> AddModel(string model);
-
-        CarResults<Engine> AddEngine(string engine);
-
         Car AddCar(CarDto newCar);
 
         Task<CarDto> OpenAICarValidation(CarDto car);
+
+        CreatingECUDto AddBlock(List<string> newNames);
     }
 }
