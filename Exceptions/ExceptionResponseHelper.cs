@@ -46,6 +46,9 @@ public class ExceptionResponseHelper
             case InvalidCarDataException:
                 return (HttpStatusCode.BadRequest, exception.Message);
 
+            case InvalidParameterException:
+                return (HttpStatusCode.BadRequest, exception.Message);
+
             default:
                 return (HttpStatusCode.InternalServerError, exception.Message);
         }

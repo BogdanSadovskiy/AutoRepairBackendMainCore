@@ -5,8 +5,7 @@ namespace AutoRepairMainCore.Service.Implementations
 {
     public class MediaService : IMediaService
     {
-        private readonly IConfiguration _configuration;
-        private readonly IUserService _userService;
+        private IUserService _userService;
         private List<string> imageExtensions;
         private List<string> videoExtensions;
         private string baseDirectory;
@@ -26,9 +25,8 @@ namespace AutoRepairMainCore.Service.Implementations
             };
         }
 
-        public MediaService(IConfiguration configuration, IUserService userService)
+        public MediaService(IUserService userService)
         {
-            _configuration = configuration;
             _userService = userService;
 
             InitiateListsOfExtentions();
@@ -36,7 +34,11 @@ namespace AutoRepairMainCore.Service.Implementations
 
         public async Task<string> SaveAutoServiceLogo(AutoService autoService, IFormFile logoFile)
         {
-            IsFileEmpty(logoFile);
+            if (IsFileEmpty(logoFile))
+            {
+                throw new InvalidOperationException("No file uploaded.");
+            }
+
             string fileExtension = GetFileExtension(logoFile);
             CheckFileExtension(fileExtension, MediaType.image);
 
@@ -53,11 +55,32 @@ namespace AutoRepairMainCore.Service.Implementations
             return relativeFilePath;
         }
 
+
+        public async Task<string> SaveEmployeePhoto(AutoService autoService, Employee employee, IFormFile photo)
+        {
+            if (photo == null)
+            {
+                return null;
+            }
+
+            string fileExtension = GetFileExtension(photo);
+            CheckFileExtension(fileExtension, MediaType.image);
+
+            string baseFileName = $"{employee.EmployeeName}_photo";
+            string relativePath = Path.Combine(autoService.Name, "Employees", employee.EmployeeName);
+            string directoryPath = CreateDirectory(relativePath);
+            string filePath = GetUniqueFilePath(directoryPath, baseFileName, fileExtension);
+
+            SaveFile(photo, filePath);
+
+            return ConvertToRelativePath(filePath);
+        }
+
         private bool IsFileEmpty(IFormFile file)
         {
             if (file == null)
             {
-                throw new InvalidOperationException("No file uploaded.");
+                return false;
             }
             return true;
         }
