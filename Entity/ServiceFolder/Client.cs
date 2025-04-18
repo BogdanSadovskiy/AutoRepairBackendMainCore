@@ -10,10 +10,19 @@ namespace AutoRepairMainCore.Entity.ServiceFolder
         [Column("id")]
         public int Id { get; set; }
 
+        [Column("autoservice_id")]
+        public int AutoserviceId { get; set; }
+
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("surname")]
+        public string Surname { get;set; }
+
         [Column("phone")]
         public string Phone { get; set; }
+
+        [ForeignKey("AutoserviceId")]
+        public AutoService Autoservice { get; set; }
     }
 }

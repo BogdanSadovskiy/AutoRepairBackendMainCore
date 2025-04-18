@@ -13,18 +13,23 @@ namespace AutoRepairMainCore.Controllers
         private IUserService _userService;
         private IMediaService _mediaService;
         private IEmployeeService _employeeService;
+        private ITokenValidationService _tokenValidationService;
 
-        public UserController(IUserService userService, IEmployeeService employeeService, IMediaService mediaService)
+        public UserController(IUserService userService, IEmployeeService employeeService, 
+            IMediaService mediaService, ITokenValidationService tokenValidationService)
         {
             _userService = userService;
             _mediaService = mediaService;
             _employeeService = employeeService;
+            _tokenValidationService = tokenValidationService;
         }
 
         [Authorize(Policy = "AdminOrUser")]
         [HttpPost("add-employee")]
-        public async Task<IActionResult> CreateEmployee([FromForm] int userId, EmployeeDto employee)
+        public async Task<IActionResult> CreateEmployee([FromForm] EmployeeDto employee)
         {
+            string token = Request.Headers["Authorization"].ToString();
+            int userId = _tokenValidationService.GetAutoServiceIdFromToken(token);
             AutoService autoService = await _userService.GetAutoServiceById(userId);
             Employee createdEmployee = _employeeService.CreateEmployee(autoService, employee);
 
@@ -38,9 +43,11 @@ namespace AutoRepairMainCore.Controllers
         }
 
         [Authorize(Policy = "AdminOrUser")]
-        [HttpPost("update-employee")]
-        public async Task<IActionResult> UpdateEmployee([FromForm] int userId, UpdateEmployeeDto employee)
+        [HttpPut("update-employee")]
+        public async Task<IActionResult> UpdateEmployee([FromForm] UpdateEmployeeDto employee)
         {
+            string token = Request.Headers["Authorization"].ToString();
+            int userId = _tokenValidationService.GetAutoServiceIdFromToken(token);
             Employee existingEmployee = _employeeService.FindEmployeeById(userId, employee.Id);
             string photoPath = "";
 
@@ -53,6 +60,12 @@ namespace AutoRepairMainCore.Controllers
 
             return Ok(_employeeService.CreateEmployeeForFrontend(existingEmployee));
         }
+
+        //[HttpPost("add-client")]
+        //public async Task<IActionResult> AddClient([FromBody] ClientDto client)
+        //{
+
+        //}
 
     }
 }

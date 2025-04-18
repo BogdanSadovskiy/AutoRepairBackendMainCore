@@ -30,16 +30,18 @@ namespace AutoRepairMainCore.Service.Implementations
 
         public async Task<string> RegisterServiceAsync(AutoServiceAuthDto userAutoService)
         {
+            ValidateEmail(userAutoService.Email);
             ValidatePassword(userAutoService.Password);
+            ValidateName(userAutoService.Name);
 
-            if (await _userService.GetAutoServiceByName(userAutoService.Name) != null)
+            if (await _userService.GetAutoServiceByEmail(userAutoService.Email) != null)
             {
-                throw new AutoServiceAlreadyExistException($"A service \"{userAutoService.Name}\" already exists.");
+                throw new AutoServiceAlreadyExistException($"This Email already used.");
             }
 
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userAutoService.Password);
 
-            AutoService myService = _userService.CreateAutoService(userAutoService.Name, hashedPassword);
+            AutoService myService = _userService.CreateAutoServiceObject(userAutoService.Name, userAutoService.Email, hashedPassword);
             _roleService.SetRole(myService);
 
             _context.services.Add(myService);
@@ -49,10 +51,10 @@ namespace AutoRepairMainCore.Service.Implementations
 
         public async Task<AutoServiceFrontendDTO> LoginServiceAsync(AutoServiceAuthDto userAutoService)
         {
-            AutoService autoService = await _userService.GetAutoServiceByName(userAutoService.Name);
+            AutoService autoService = await _userService.GetAutoServiceByEmail(userAutoService.Email);
             if (autoService == null)
             {
-                throw new AutoServiceNotFoundException("Invalid service name or password");
+                throw new AutoServiceNotFoundException("Invalid service email or password");
             }
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userAutoService.Password, autoService.Password);
             if (!isPasswordValid)
@@ -62,14 +64,15 @@ namespace AutoRepairMainCore.Service.Implementations
             Role role = _roleService.GetRole(autoService.RoleId);
             string token = _tokenValidationService.GenerateToken(autoService, role);
 
-            return IfSuccessfullLogin(autoService, token);
+            return SuccessfullLogin(autoService, token);
         }
 
-        private AutoServiceFrontendDTO IfSuccessfullLogin(AutoService autoservice, string token)
+        private AutoServiceFrontendDTO SuccessfullLogin(AutoService autoservice, string token)
         {
             AutoServiceFrontendDTO autoServiceFrontendDTO = new AutoServiceFrontendDTO()
             {
                 Id = autoservice.Id,
+                Email = autoservice.Email,
                 Name = autoservice.Name,
                 Role = autoservice.Role.Name,
                 LogoPath = autoservice.serviceIconFilePath,
@@ -89,6 +92,22 @@ namespace AutoRepairMainCore.Service.Implementations
                                     "At least one uppercase letter.";
 
                 throw new PasswordValidateException(passwordRule);
+            }
+        }
+
+        private void ValidateEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email) ||
+                !Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")) {
+                throw new InvalidParameterException("Input correct email type");
+            }
+        }
+
+        private void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new InvalidParameterException("Input Name of your autoservice");
             }
         }
     }

@@ -5,9 +5,9 @@ namespace AutoRepairMainCore.Service
 {
     public interface IUserService
     {
-        AutoService CreateAutoService(string name, string password);
+        AutoService CreateAutoServiceObject(string name, string email, string password);
 
-        Task<AutoService> GetAutoServiceByName(string autoserviceName);
+        Task<AutoService> GetAutoServiceByEmail(string email);
 
         Task<AutoService> GetAutoServiceById(int id);
 

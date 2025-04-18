@@ -4,10 +4,7 @@ using AutoRepairMainCore.Exceptions;
 using AutoRepairMainCore.Infrastructure;
 using AutoRepairMainCore.Service;
 using AutoRepairMainCore.Service.Implementations;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +26,22 @@ builder.Services.AddHttpClient("OpenAIMicroServiceClient", client =>
     client.BaseAddress = new Uri(OpenAiMicroServiceConnectionString);
 });
 
-builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .WithMethods("GET", "POST", "Put");
+    });
+});
+
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
@@ -38,6 +50,7 @@ builder.Services.AddScoped<ITokenValidationService, TokenValidationService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 
@@ -50,6 +63,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterType<EmployeeService>().As<IEmployeeService>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<MediaService>().As<IMediaService>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ClientService>().As<IClientService>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<OrderService>().As<IOrderService>().InstancePerLifetimeScope();
 });
 
@@ -65,18 +79,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ExceptionsHandlerMiddleware>(); 
+app.UseMiddleware<ExceptionsHandlerMiddleware>();
 
 app.MapControllers();
 
-try
-{
-    app.Run();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Unhandled exception: {ex.Message}");
-    throw;
-}
+
+app.Run();
+

@@ -104,7 +104,7 @@ public class GeneralCarsService : IGeneralCarsService
         IsValidCarDTO(newCar);
         FormatCar(newCar);
 
-        var existingCar = CheckExistingCar(newCar.Brand, newCar.Model, newCar.Engine);
+        Car existingCar = CheckExistingCar(newCar.Brand, newCar.Model, newCar.Engine);
         if (existingCar != null)
         {
             throw new CarAlreadyExistException($"The {newCar.Brand} {newCar.Model} {newCar.Engine}" +
@@ -115,7 +115,7 @@ public class GeneralCarsService : IGeneralCarsService
         var modelResult = AddModel(newCar.Model);
         var engineResult = AddEngine(newCar.Engine);
 
-        var newEntityCar = new Car
+        Car newEntityCar = new Car
         {
             BrandId = brandResult.Entity.Id,
             ModelId = modelResult.Entity.Id,

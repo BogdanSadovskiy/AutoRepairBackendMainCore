@@ -16,18 +16,19 @@ namespace AutoRepairMainCore.Service.Implementations
             _context = context;
         }
 
-        public AutoService CreateAutoService(string name, string password)
+        public AutoService CreateAutoServiceObject(string name, string email, string password)
         {
             return new AutoService()
             {
                 Name = name,
+                Email = email,
                 Password = password
             };
         }
 
-        public async Task<AutoService> GetAutoServiceByName(string autoserviceName)
+        public async Task<AutoService> GetAutoServiceByEmail(string email)
         {
-            AutoService autoService = await _context.services.FirstOrDefaultAsync(s => s.Name == autoserviceName);
+            AutoService autoService = await _context.services.FirstOrDefaultAsync(s => s.Email == email);
             return autoService;
         }
 
